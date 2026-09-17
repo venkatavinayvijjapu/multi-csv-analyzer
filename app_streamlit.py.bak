@@ -1,0 +1,520 @@
+import streamlit as st
+import pandas as pd
+from dotenv import load_dotenv
+import os
+import base64
+import io
+import json
+import requests
+import logging
+from langchain.agents import AgentExecutor, create_openai_tools_agent
+from langchain_groq import ChatGroq
+from prompt import get_prompt
+from analysis_wrapper import DataAnalysisTool, DataAnalysisAPIWrapper
+from visualizationwrapper import DataVisualizationTool, DataVisualizationAPIWrapper
+from delta_analysis import check_delta
+
+# ─── Logging ────────────────────────────────────────────────────────────────
+logging.basicConfig(
+    level=logging.DEBUG, filename="app.log", filemode="a",
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
+
+# ─── Environment ─────────────────────────────────────────────────────────────
+load_dotenv()
+api_key = os.getenv("GROQ_API_KEY")
+model_name = os.getenv("GROQ_MODEL")
+
+# ─── Page Config ─────────────────────────────────────────────────────────────
+st.set_page_config(
+    page_title="DataLens AI — Multi-File Analyst",
+    page_icon="🔬",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+# ─── Custom CSS ──────────────────────────────────────────────────────────────
+st.markdown("""
+<style>
+/* ── Google Font ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+}
+
+/* ── Background ── */
+.stApp {
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    min-height: 100vh;
+}
+
+/* ── Sidebar ── */
+section[data-testid="stSidebar"] {
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(12px);
+    border-right: 1px solid rgba(255,255,255,0.08);
+}
+
+section[data-testid="stSidebar"] * { color: #e0e0e0 !important; }
+
+/* ── Header ── */
+.app-header {
+    background: linear-gradient(90deg, #6C63FF, #A29BFE);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 0;
+}
+.app-subtitle {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.95rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+/* ── File cards ── */
+.file-card {
+    background: rgba(108,99,255,0.12);
+    border: 1px solid rgba(108,99,255,0.3);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: #c0b9ff;
+}
+.file-card-icon { font-size: 1.2rem; }
+.file-card-stats { color: rgba(255,255,255,0.4); font-size: 0.75rem; margin-top: 2px; }
+
+/* ── Chat messages ── */
+.stChatMessage { border-radius: 14px !important; }
+
+div[data-testid="stChatMessageContent"] {
+    font-size: 0.93rem;
+    line-height: 1.6;
+}
+
+/* User messages */
+div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarUser"]) {
+    background: rgba(108,99,255,0.15) !important;
+    border: 1px solid rgba(108,99,255,0.2) !important;
+}
+
+/* ── Delta badge ── */
+.delta-badge {
+    display: inline-block;
+    background: linear-gradient(90deg, #43B89C, #00b894);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+}
+
+/* ── Metric cards ── */
+.metric-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+.metric-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 14px 18px;
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+}
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #A29BFE;
+}
+.metric-label {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.45);
+    margin-top: 2px;
+}
+
+/* ── Buttons ── */
+.stButton > button {
+    background: linear-gradient(135deg, #6C63FF, #A29BFE) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    transition: opacity 0.2s !important;
+}
+.stButton > button:hover { opacity: 0.85 !important; }
+
+/* ── Chat input ── */
+.stChatInputContainer {
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid rgba(108,99,255,0.4) !important;
+    border-radius: 14px !important;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #6C63FF55; border-radius: 10px; }
+
+/* ── Expander ── */
+.streamlit-expanderHeader {
+    background: rgba(255,255,255,0.04) !important;
+    border-radius: 8px !important;
+    color: #c0b9ff !important;
+}
+
+/* ── Tables ── */
+.stDataFrame { border-radius: 10px; overflow: hidden; }
+
+/* ── Divider ── */
+hr { border-color: rgba(255,255,255,0.07) !important; }
+</style>
+""", unsafe_allow_html=True)
+
+API_URL = "http://127.0.0.1:8000"
+
+# ─── Helpers ─────────────────────────────────────────────────────────────────
+
+def read_file(uploaded_file) -> pd.DataFrame:
+    name = uploaded_file.name.lower()
+    if name.endswith(".xlsx") or name.endswith(".xls"):
+        return pd.read_excel(uploaded_file)
+    return pd.read_csv(uploaded_file)
+
+
+def get_chart_image(chart_data: dict, title: str = "") -> str | None:
+    """Call the /smart_chart endpoint and return base64 image or None."""
+    try:
+        payload = {
+            "chart_type": chart_data.get("type", "bar"),
+            "labels": [str(l) for l in chart_data.get("labels", [])],
+            "datasets": chart_data.get("datasets", []),
+            "title": title,
+        }
+        resp = requests.post(f"{API_URL}/smart_chart", json=payload, timeout=30)
+        if resp.status_code == 200:
+            return resp.json().get("image_base64")
+    except Exception as e:
+        logger.warning(f"Smart chart call failed: {e}")
+    return None
+
+
+def is_image_base64(s: str) -> bool:
+    """Heuristic: long string that is valid base64 = image."""
+    if len(s) < 1000:
+        return False
+    try:
+        decoded = base64.b64decode(s[:20])
+        return True
+    except Exception:
+        return False
+
+
+def init_agent():
+    """Create (or re-create) the LangChain agent."""
+    if not api_key or not model_name:
+        return
+    llm = ChatGroq(temperature=0, model=model_name, api_key=api_key)
+    analysis_wrapper = DataAnalysisAPIWrapper()
+    viz_wrapper = DataVisualizationAPIWrapper()
+    analysis_tool = DataAnalysisTool(api_wrapper=analysis_wrapper)
+    viz_tool = DataVisualizationTool(api_wrapper=viz_wrapper)
+    tools = [analysis_tool, viz_tool]
+    prompt = get_prompt()
+    agent = create_openai_tools_agent(llm, tools, prompt)
+    st.session_state.agent_executor = AgentExecutor(
+        agent=agent, tools=tools, verbose=True, max_iterations=6,
+    )
+
+
+# ─── Session state init ───────────────────────────────────────────────────────
+if "dataframes" not in st.session_state:
+    st.session_state.dataframes = {}          # {filename: df}
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+if "agent_executor" not in st.session_state:
+    st.session_state.agent_executor = None
+
+# ─── Sidebar ─────────────────────────────────────────────────────────────────
+with st.sidebar:
+    st.markdown("## 🔬 DataLens AI")
+    st.markdown("*Multi-file analytical assistant*")
+    st.divider()
+
+    # ── API key check
+    if not api_key:
+        st.error("⚠️ GROQ_API_KEY missing in .env", icon="🔑")
+    else:
+        st.success(f"✅ Model: `{model_name}`", icon="🤖")
+
+    st.divider()
+
+    # ── File Uploader
+    st.markdown("### 📂 Upload Files")
+    uploaded_files = st.file_uploader(
+        "CSV or Excel files",
+        type=["csv", "xlsx", "xls"],
+        accept_multiple_files=True,
+        help="Upload one or more CSV / Excel files. You can add more files without losing existing ones.",
+        label_visibility="collapsed",
+    )
+
+    if uploaded_files:
+        newly_added = []
+        for uf in uploaded_files:
+            if uf.name not in st.session_state.dataframes:
+                try:
+                    df = read_file(uf)
+                    st.session_state.dataframes[uf.name] = df
+                    newly_added.append(uf.name)
+                except Exception as e:
+                    st.error(f"Failed to read `{uf.name}`: {e}")
+
+        if newly_added:
+            # Re-initialise agent whenever files change
+            init_agent()
+
+    # ── Loaded files list
+    dfs = st.session_state.dataframes
+    if dfs:
+        st.markdown(f"### 📋 Loaded Files ({len(dfs)})")
+        for name, df in dfs.items():
+            ext_icon = "📊" if name.endswith((".xlsx", ".xls")) else "📄"
+            st.markdown(
+                f"""<div class="file-card">
+                    <span class="file-card-icon">{ext_icon}</span>
+                    <div>
+                        <div><b>{name}</b></div>
+                        <div class="file-card-stats">{df.shape[0]:,} rows · {df.shape[1]} cols</div>
+                    </div>
+                </div>""",
+                unsafe_allow_html=True,
+            )
+
+        st.divider()
+
+        # ── Remove file controls
+        with st.expander("🗑️ Remove a file"):
+            to_remove = st.selectbox("Select file to remove", options=list(dfs.keys()))
+            if st.button("Remove file"):
+                del st.session_state.dataframes[to_remove]
+                st.session_state.agent_executor = None
+                init_agent()
+                st.rerun()
+
+        # ── Clear all
+        if st.button("🗑️ Clear all files & chat"):
+            st.session_state.dataframes = {}
+            st.session_state.messages = []
+            st.session_state.agent_executor = None
+            st.rerun()
+
+    else:
+        st.info("⬆️ Upload files above to get started.", icon="💡")
+
+    st.divider()
+
+    # ── Suggested queries
+    if dfs:
+        st.markdown("### 💡 Suggested Questions")
+        suggestions = [
+            "Describe all datasets",
+            "Compare average of numeric columns across files",
+            "Show trend over time",
+            "Which file has the highest total?",
+            "Find missing values",
+            "Show a bar chart comparing all files",
+        ]
+        for s in suggestions:
+            if st.button(s, key=f"sugg_{s}", use_container_width=True):
+                st.session_state._pending_query = s
+
+
+# ─── Main Area ───────────────────────────────────────────────────────────────
+st.markdown('<h1 class="app-header">🔬 DataLens AI</h1>', unsafe_allow_html=True)
+st.markdown(
+    '<p class="app-subtitle">Upload CSV or Excel files · Ask questions in plain English · Get instant answers & charts</p>',
+    unsafe_allow_html=True,
+)
+
+dfs = st.session_state.dataframes
+
+if dfs:
+    # ── File preview tabs
+    with st.expander(f"📂 Dataset Previews ({len(dfs)} files)", expanded=False):
+        tabs = st.tabs(list(dfs.keys()))
+        for tab, (name, df) in zip(tabs, dfs.items()):
+            with tab:
+                col1, col2, col3, col4 = st.columns(4)
+                col1.metric("Rows", f"{df.shape[0]:,}")
+                col2.metric("Columns", df.shape[1])
+                col3.metric("Numeric cols", df.select_dtypes("number").shape[1])
+                col4.metric("Null values", int(df.isnull().sum().sum()))
+                st.dataframe(df.head(8), use_container_width=True)
+
+    st.divider()
+
+    # ── Chat history
+    for msg in st.session_state.messages:
+        with st.chat_message(msg["role"]):
+            if msg.get("delta"):
+                st.markdown(
+                    '<span class="delta-badge">⚡ DELTA — Instant Answer</span>',
+                    unsafe_allow_html=True,
+                )
+            st.markdown(msg["content"])
+            if msg.get("image"):
+                st.image(msg["image"], use_container_width=True)
+
+    # ── Handle pending query from sidebar buttons
+    pending = st.session_state.pop("_pending_query", None)
+    user_input = (
+        st.chat_input("Ask anything about your data — e.g. 'Compare totals', 'Show a trend chart'...")
+        or pending
+    )
+
+    if user_input:
+        # Add user message
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        with st.chat_message("user"):
+            st.markdown(user_input)
+
+        with st.chat_message("assistant"):
+            with st.spinner("⚡ Thinking..."):
+                # ── STEP 1: Try delta layer first ──────────────────────────
+                delta_result, chart_data = check_delta(user_input, dfs)
+
+                if delta_result is not None:
+                    # Delta answered it!
+                    st.markdown(
+                        '<span class="delta-badge">⚡ DELTA — Instant Answer</span>',
+                        unsafe_allow_html=True,
+                    )
+                    st.markdown(delta_result)
+                    image_src = None
+
+                    if chart_data and chart_data.get("datasets"):
+                        img_b64 = get_chart_image(chart_data, title=user_input[:60])
+                        if img_b64:
+                            image_src = f"data:image/png;base64,{img_b64}"
+                            st.image(image_src, use_container_width=True)
+
+                    st.session_state.messages.append({
+                        "role": "assistant",
+                        "content": delta_result,
+                        "image": image_src,
+                        "delta": True,
+                    })
+
+                else:
+                    # ── STEP 2: Fall through to LangChain + Groq ───────────
+                    if not st.session_state.agent_executor:
+                        if not api_key or not model_name:
+                            st.error("GROQ_API_KEY or GROQ_MODEL not set in .env")
+                            st.stop()
+                        init_agent()
+
+                    try:
+                        logger.debug(f"LLM query: {user_input}")
+                        response = st.session_state.agent_executor.invoke(
+                            {"input": user_input}
+                        )
+                        output = response.get("output", "")
+                        logger.debug(f"LLM output (first 500): {output[:500]}")
+
+                        # Check if output is a base64 image
+                        image_src = None
+                        if is_image_base64(output):
+                            image_src = f"data:image/png;base64,{output}"
+                            display_text = "✅ Chart generated successfully."
+                        else:
+                            display_text = output
+
+                        st.markdown(display_text)
+                        if image_src:
+                            st.image(image_src, use_container_width=True)
+
+                        st.session_state.messages.append({
+                            "role": "assistant",
+                            "content": display_text,
+                            "image": image_src,
+                            "delta": False,
+                        })
+
+                    except Exception as e:
+                        err_msg = str(e)
+                        if "max iterations" in err_msg.lower():
+                            err_msg = (
+                                "⚠️ Query is too complex or ambiguous. "
+                                "Try specifying a column name or metric."
+                            )
+                        else:
+                            err_msg = f"❌ Error: {err_msg}"
+                        logger.error(f"Agent error: {e}")
+                        st.markdown(err_msg)
+                        st.session_state.messages.append({
+                            "role": "assistant",
+                            "content": err_msg,
+                            "delta": False,
+                        })
+
+else:
+    # ── Landing screen ────────────────────────────────────────────────────────
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.markdown("""
+        <div class="metric-card">
+            <div style="font-size:2rem">📂</div>
+            <div class="metric-value" style="font-size:1.1rem">Multi-File</div>
+            <div class="metric-label">Upload CSV & Excel files simultaneously</div>
+        </div>""", unsafe_allow_html=True)
+
+    with col2:
+        st.markdown("""
+        <div class="metric-card">
+            <div style="font-size:2rem">⚡</div>
+            <div class="metric-value" style="font-size:1.1rem">Delta Layer</div>
+            <div class="metric-label">Instant answers for common queries — no AI latency</div>
+        </div>""", unsafe_allow_html=True)
+
+    with col3:
+        st.markdown("""
+        <div class="metric-card">
+            <div style="font-size:2rem">📊</div>
+            <div class="metric-value" style="font-size:1.1rem">Smart Charts</div>
+            <div class="metric-label">Auto-generated visuals for every analytical answer</div>
+        </div>""", unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    st.markdown("""
+    <div style="text-align:center; padding: 40px 20px; background: rgba(108,99,255,0.07);
+         border: 1px solid rgba(108,99,255,0.2); border-radius: 16px; max-width:600px; margin:auto;">
+        <div style="font-size:3rem">🔬</div>
+        <h2 style="color:#A29BFE; margin:12px 0 8px;">Get Started</h2>
+        <p style="color:rgba(255,255,255,0.5); font-size:0.95rem; margin:0;">
+            Upload one or more <strong style="color:#c0b9ff">CSV or Excel</strong> files
+            using the sidebar on the left, then ask questions in plain English.
+        </p>
+        <br>
+        <p style="color:rgba(255,255,255,0.3); font-size:0.8rem;">
+            Supports totals · averages · comparisons · trends · filters · charts · cross-file analysis
+        </p>
+    </div>
+    """, unsafe_allow_html=True)

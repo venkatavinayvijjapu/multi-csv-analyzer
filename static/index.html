@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataLens AI — Multi-File Analytics</title>
+    <meta name="description"
+        content="AI-powered multi-file CSV and Excel analytics. Ask questions in plain English, get instant answers and interactive charts.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
+
+    <style>
+        /* ══════════════════════════════════════════════
+           CSS VARIABLES
+        ══════════════════════════════════════════════ */
+        :root {
+            --bg: #080B12;
+            --bg-sidebar: #0C1018;
+            --bg-card: rgba(255, 255, 255, 0.04);
+            --bg-card-hover: rgba(255, 255, 255, 0.07);
+            --bg-input: rgba(14, 20, 30, 0.95);
+            --bg-bubble-ai: rgba(255, 255, 255, 0.04);
+            --bg-bubble-usr: rgba(109, 81, 255, 0.12);
+
+            --border: rgba(255, 255, 255, 0.07);
+            --border-strong: rgba(255, 255, 255, 0.14);
+            --border-focus: rgba(109, 81, 255, 0.55);
+
+            --purple: #7C5CFF;
+            --purple-lt: #A78BFA;
+            --cyan: #22D3EE;
+            --green: #10B981;
+            --amber: #F59E0B;
+            --red: #F43F5E;
+
+            --tx-primary: #E8EDF5;
+            --tx-secondary: #8A9BBF;
+            --tx-muted: #4A5568;
+
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --sidebar-w: 300px;
+            --font: 'Inter', -apple-system, sans-serif;
+            --mono: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--tx-primary);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        /* ══════════════════════════════════════════════
+           LAYOUT
+        ══════════════════════════════════════════════ */
+        .layout {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* ══════════════════════════════════════════════
+           SIDEBAR
+        ══════════════════════════════════════════════ */
+        .sidebar {
+            width: var(--sidebar-w);
+            min-width: var(--sidebar-w);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            position: relative;
+            z-index: 10;
+        }
+
+        .sidebar::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg,
+                    rgba(124, 92, 255, 0.04) 0%,
+                    transparent 40%);
+            pointer-events: none;
+        }
+
+        .sidebar-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* ── Brand ── */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand-logo {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #7C5CFF 0%, #22D3EE 100%);
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(124, 92, 255, 0.35);
+        }
+
+        .brand-name {
+            font-size: 1rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #A78BFA 0%, #38BDF8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.4px;
+        }
+
+        .brand-sub {
+            font-size: 0.67rem;
+            color: var(--tx-muted);
+            margin-top: 1px;
+            letter-spacing: 0.3px;
+        }
+
+        /* ── Section Labels ── */
+        .sec-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--tx-muted);
+            margin-bottom: 8px;
+        }
+
+        /* ── Drop Zone ── */
+        .drop-zone {
+            border: 2px dashed rgba(124, 92, 255, 0.3);
+            border-radius: var(--radius-md);
+            padding: 22px 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: rgba(124, 92, 255, 0.04);
+            position: relative;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.drag-over {
+            border-color: var(--purple);
+            background: rgba(124, 92, 255, 0.09);
+            box-shadow: 0 0 24px rgba(124, 92, 255, 0.12),
+                inset 0 0 24px rgba(124, 92, 255, 0.04);
+        }
+
+        .drop-icon {
+            font-size: 2.2rem;
+            display: block;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 0 8px rgba(124, 92, 255, 0.4));
+            transition: transform 0.2s;
+        }
+
+        .drop-zone:hover .drop-icon {
+            transform: translateY(-3px);
+        }
+
+        .drop-text {
+            font-size: 0.78rem;
+            color: var(--tx-secondary);
+            line-height: 1.5;
+        }
+
+        .drop-text strong {
+            color: var(--purple-lt);
+        }
+
+        .drop-formats {
+            font-size: 0.65rem;
+            color: var(--tx-muted);
+            margin-top: 5px;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Upload progress */
+        .upload-progress {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: var(--purple-lt);
+            margin-top: 8px;
+            justify-content: center;
+        }
+
+        .upload-progress.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 13px;
+            height: 13px;
+            border: 2px solid rgba(124, 92, 255, 0.2);
+            border-top-color: var(--purple);
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ── File Cards ── */
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .no-files-msg {
+            text-align: center;
+            color: var(--tx-muted);
+            font-size: 0.73rem;
+            padding: 10px 0;
+        }
+
+        .file-card {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 9px 11px;
+            animation: slideIn 0.22s ease;
+            transition: background 0.15s;
+        }
+
+        .file-card:hover {
+            background: var(--bg-card-hover);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-10px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .file-type-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .file-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-name {
+            font-size: 0.76rem;
+            font-weight: 500;
+            color: var(--tx-primary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-meta {
+            font-size: 0.65rem;
+            color: var(--tx-muted);
+            margin-top: 1px;
+        }
+
+        .file-del {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--tx-muted);
+            font-size: 0.8rem;
+            padding: 3px 5px;
+            border-radius: 4px;
+            line-height: 1;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+
+        .file-del:hover {
+            color: var(--red);
+            background: rgba(244, 63, 94, 0.1);
+        }
+
+        /* ── Suggestions ── */
+        .suggestions {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .sugg-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 7px 10px;
+            font-family: var(--font);
+            font-size: 0.73rem;
+            color: var(--tx-secondary);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.18s;
+            line-height: 1.4;
+        }
+
+        .sugg-btn:hover {
+            background: rgba(124, 92, 255, 0.1);
+            border-color: rgba(124, 92, 255, 0.35);
+            color: var(--tx-primary);
+            transform: translateX(2px);
+        }
+
+        /* ── Sidebar Footer ── */
+        .sidebar-footer {
+            padding: 12px 14px;
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .clear-btn {
+            width: 100%;
+            background: rgba(244, 63, 94, 0.07);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+            border-radius: var(--radius-sm);
+            color: #FB7185;
+            font-family: var(--font);
+            font-size: 0.73rem;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.18s;
+        }
+
+        .clear-btn:hover {
+            background: rgba(244, 63, 94, 0.14);
+            border-color: rgba(244, 63, 94, 0.4);
+        }
+
+        /* ══════════════════════════════════════════════
+           MAIN AREA
+        ══════════════════════════════════════════════ */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: linear-gradient(160deg, #0A0D16 0%, #080B12 100%);
+        }
+
+        /* ── Top Bar ── */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 13px 22px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(8, 11, 18, 0.85);
+            backdrop-filter: blur(12px);
+            flex-shrink: 0;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .topbar-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--tx-secondary);
+        }
+
+        .file-badge {
+            display: none;
+            background: rgba(124, 92, 255, 0.14);
+            border: 1px solid rgba(124, 92, 255, 0.28);
+            border-radius: 20px;
+            padding: 2px 9px;
+            font-size: 0.67rem;
+            color: var(--purple-lt);
+            font-weight: 500;
+        }
+
+        .file-badge.visible {
+            display: inline-block;
+        }
+
+        .model-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 0.67rem;
+            color: var(--tx-muted);
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: livePulse 2.5s infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes livePulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+            }
+
+            50% {
+                opacity: 0.6;
+                box-shadow: 0 0 0 4px rgba(16, 185, 129, 0);
+            }
+        }
+
+        /* ── Chat Container ── */
+        #chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 28px 28px 16px;
+        }
+
+        /* ── Welcome Screen ── */
+        #welcome {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 18px;
+            text-align: center;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .welcome-glyph {
+            font-size: 4.5rem;
+            filter: drop-shadow(0 0 40px rgba(124, 92, 255, 0.45));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .welcome-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #A78BFA 0%, #38BDF8 50%, #34D399 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .welcome-sub {
+            max-width: 420px;
+            color: var(--tx-muted);
+            font-size: 0.88rem;
+            line-height: 1.65;
+        }
+
+        .feature-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 4px;
+        }
+
+        .chip {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 5px 13px;
+            font-size: 0.73rem;
+            color: var(--tx-secondary);
+            white-space: nowrap;
+        }
+
+        /* ── Messages ── */
+        .msg {
+            margin-bottom: 22px;
+            animation: msgIn 0.25s ease;
+        }
+
+        @keyframes msgIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        /* User */
+        .msg-user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .bubble-user {
+            background: linear-gradient(135deg,
+                    rgba(124, 92, 255, 0.18) 0%,
+                    rgba(34, 211, 238, 0.08) 100%);
+            border: 1px solid rgba(124, 92, 255, 0.28);
+            border-radius: 18px 18px 4px 18px;
+            padding: 12px 16px;
+            max-width: 70%;
+            font-size: 0.88rem;
+            line-height: 1.55;
+            color: var(--tx-primary);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* Assistant */
+        .msg-ai {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ai-row {
+            display: flex;
+            gap: 11px;
+            align-items: flex-start;
+        }
+
+        .ai-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #7C5CFF, #22D3EE);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 10px rgba(124, 92, 255, 0.3);
+        }
+
+        .ai-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .delta-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-size: 0.63rem;
+            font-weight: 700;
+            color: #34D399;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 7px;
+        }
+
+        .bubble-ai {
+            background: var(--bg-bubble-ai);
+            border: 1px solid var(--border);
+            border-radius: 4px 18px 18px 18px;
+            padding: 14px 16px;
+            font-size: 0.875rem;
+            line-height: 1.7;
+            color: var(--tx-primary);
+            word-break: break-word;
+        }
+
+        /* Markdown inside AI bubble */
+        .bubble-ai h1,
+        .bubble-ai h2,
+        .bubble-ai h3 {
+            color: var(--purple-lt);
+            margin: 10px 0 5px;
+        }
+
+        .bubble-ai h3 {
+            font-size: 0.95rem;
+        }
+
+        .bubble-ai p {
+            margin: 5px 0;
+        }
+
+        .bubble-ai ul,
+        .bubble-ai ol {
+            margin: 6px 0 6px 18px;
+        }
+
+        .bubble-ai li {
+            margin: 3px 0;
+        }
+
+        .bubble-ai strong {
+            color: #C8D8F0;
+            font-weight: 600;
+        }
+
+        .bubble-ai em {
+            color: var(--tx-secondary);
+        }
+
+        .bubble-ai code {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-family: var(--mono);
+            font-size: 0.8em;
+        }
+
+        .bubble-ai pre {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            overflow-x: auto;
+            margin: 8px 0;
+        }
+
+        .bubble-ai pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 0.83em;
+        }
+
+        .bubble-ai table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0;
+            font-size: 0.82rem;
+        }
+
+        .bubble-ai th {
+            background: rgba(124, 92, 255, 0.12);
+            color: var(--purple-lt);
+            padding: 6px 11px;
+            border: 1px solid var(--border);
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .bubble-ai td {
+            padding: 5px 11px;
+            border: 1px solid var(--border);
+            color: var(--tx-secondary);
+        }
+
+        .bubble-ai tr:nth-child(even) td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .bubble-ai blockquote {
+            border-left: 3px solid var(--purple);
+            padding-left: 12px;
+            color: var(--tx-secondary);
+            margin: 8px 0;
+        }
+
+        .bubble-ai hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 10px 0;
+        }
+
+        /* ── Chart & Image ── */
+        .chart-wrap {
+            margin-top: 10px;
+            background: rgba(8, 11, 18, 0.7);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px 16px 12px;
+        }
+
+        .chart-wrap canvas {
+            max-height: 300px;
+        }
+
+        .res-img {
+            margin-top: 10px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            max-width: 100%;
+            display: block;
+        }
+
+        /* ── Typing indicator ── */
+        .typing-wrap {
+            display: flex;
+            gap: 11px;
+            align-items: flex-start;
+        }
+
+        .typing-dots {
+            background: var(--bg-bubble-ai);
+            border: 1px solid var(--border);
+            border-radius: 4px 18px 18px 18px;
+            padding: 14px 18px;
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .t-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--purple);
+            border-radius: 50%;
+            animation: tBounce 1.3s infinite;
+        }
+
+        .t-dot:nth-child(2) {
+            animation-delay: 0.18s;
+        }
+
+        .t-dot:nth-child(3) {
+            animation-delay: 0.36s;
+        }
+
+        @keyframes tBounce {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+                opacity: 0.45;
+            }
+
+            30% {
+                transform: translateY(-6px);
+                opacity: 1;
+            }
+        }
+
+        /* ── Error ── */
+        .bubble-error {
+            background: rgba(244, 63, 94, 0.07);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+            border-radius: 4px 18px 18px 18px;
+            padding: 12px 16px;
+            font-size: 0.875rem;
+            color: #FDA4AF;
+        }
+
+        /* ── Input Area ── */
+        .input-area {
+            border-top: 1px solid var(--border);
+            background: rgba(8, 11, 18, 0.92);
+            backdrop-filter: blur(12px);
+            padding: 14px 22px 18px;
+            flex-shrink: 0;
+        }
+
+        .input-shell {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            background: var(--bg-input);
+            border: 1px solid rgba(124, 92, 255, 0.22);
+            border-radius: 15px;
+            padding: 11px 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-shell:focus-within {
+            border-color: rgba(124, 92, 255, 0.55);
+            box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.09);
+        }
+
+        #qinput {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--tx-primary);
+            font-family: var(--font);
+            font-size: 0.88rem;
+            line-height: 1.55;
+            resize: none;
+            min-height: 22px;
+            max-height: 110px;
+        }
+
+        #qinput::placeholder {
+            color: var(--tx-muted);
+        }
+
+        #send {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #7C5CFF 0%, #22D3EE 100%);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.18s, transform 0.18s, box-shadow 0.18s;
+            box-shadow: 0 4px 14px rgba(124, 92, 255, 0.4);
+        }
+
+        #send:hover:not(:disabled) {
+            opacity: 0.88;
+            transform: scale(1.06);
+            box-shadow: 0 6px 20px rgba(124, 92, 255, 0.55);
+        }
+
+        #send:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        #send svg {
+            width: 16px;
+            height: 16px;
+            fill: white;
+        }
+
+        .input-footer {
+            margin-top: 8px;
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            font-size: 0.65rem;
+            color: var(--tx-muted);
+        }
+
+        .kbd {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 1px 5px;
+            font-family: var(--mono);
+            font-size: 0.63rem;
+        }
+
+        /* ══════════════════════════════════════════════
+           TOAST
+        ══════════════════════════════════════════════ */
+        #toast-root {
+            position: fixed;
+            bottom: 22px;
+            right: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: rgba(14, 20, 30, 0.97);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-sm);
+            padding: 9px 14px;
+            font-size: 0.8rem;
+            color: var(--tx-primary);
+            max-width: 290px;
+            animation: toastIn 0.3s ease;
+            pointer-events: all;
+            line-height: 1.45;
+        }
+
+        .toast.ok {
+            border-left: 3px solid var(--green);
+        }
+
+        .toast.err {
+            border-left: 3px solid var(--red);
+        }
+
+        .toast.info {
+            border-left: 3px solid var(--purple);
+        }
+
+        @keyframes toastIn {
+            from {
+                transform: translateX(110%);
+                opacity: 0;
+            }
+
+            to {
+                transform: none;
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="layout">
+
+        <!-- ══ SIDEBAR ══ -->
+        <aside class="sidebar">
+            <div class="sidebar-scroll">
+
+                <!-- Brand -->
+                <div class="brand">
+                    <div class="brand-logo">🔬</div>
+                    <div>
+                        <div class="brand-name">DataLens AI</div>
+                        <div class="brand-sub">gpt-5.6-luna · LangGraph · Python 3.14</div>
+                    </div>
+                </div>
+
+                <!-- Upload -->
+                <div>
+                    <div class="sec-label">Upload Files</div>
+                    <div class="drop-zone" id="drop-zone">
+                        <input type="file" id="file-input" multiple accept=".csv,.xlsx,.xls">
+                        <span class="drop-icon">☁️</span>
+                        <div class="drop-text">
+                            <strong>Drop files here</strong><br>or click to browse
+                        </div>
+                        <div class="drop-formats">CSV · XLSX · XLS</div>
+                    </div>
+                    <div class="upload-progress" id="upload-prog">
+                        <div class="spinner"></div>
+                        <span>Uploading…</span>
+                    </div>
+                </div>
+
+                <!-- File List -->
+                <div>
+                    <div class="sec-label" id="files-label">Datasets (0)</div>
+                    <div class="file-list" id="file-list">
+                        <div class="no-files-msg">No files yet</div>
+                    </div>
+                </div>
+
+                <!-- Suggestions -->
+                <div id="sugg-section" style="display:none">
+                    <div class="sec-label">Try These</div>
+                    <div class="suggestions">
+                        <button class="sugg-btn" onclick="setQuery('Describe all datasets and show statistics')">📊
+                            Describe all datasets</button>
+                        <button class="sugg-btn" onclick="setQuery('Compare average values across all files')">⚖️
+                            Compare averages across files</button>
+                        <button class="sugg-btn" onclick="setQuery('Show total for all numeric columns')">∑ Totals for
+                            all columns</button>
+                        <button class="sugg-btn" onclick="setQuery('Find missing values in all files')">🔍 Find missing
+                            values</button>
+                        <button class="sugg-btn" onclick="setQuery('Show a bar chart comparing all datasets')">📈 Bar
+                            chart comparison</button>
+                        <button class="sugg-btn" onclick="setQuery('Show trend over time')">📉 Trend over time</button>
+                        <button class="sugg-btn" onclick="setQuery('Show correlation between numeric columns')">🔗
+                            Correlation analysis</button>
+                        <button class="sugg-btn" onclick="setQuery('Find duplicate rows in all files')">🔁 Find
+                            duplicates</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="sidebar-footer">
+                <button class="clear-btn" id="clear-btn" onclick="clearSession()">
+                    🗑️ Clear all files &amp; chat
+                </button>
+            </div>
+        </aside>
+
+        <!-- ══ MAIN ══ -->
+        <main class="main">
+
+            <!-- Top Bar -->
+            <div class="topbar">
+                <div class="topbar-left">
+                    <span class="topbar-title">Chat with your data</span>
+                    <span class="file-badge" id="file-badge">0 files</span>
+                </div>
+                <div class="model-pill">
+                    <div class="live-dot"></div>
+                    ExperientialLabs · gpt-5.6-luna · LangGraph
+                </div>
+            </div>
+
+            <!-- Chat Box -->
+            <div id="chat-box">
+                <div id="welcome">
+                    <div class="welcome-glyph">🔬</div>
+                    <div class="welcome-title">DataLens AI</div>
+                    <div class="welcome-sub">
+                        Upload one or more CSV or Excel files from the sidebar,
+                        then ask any analytical question in plain English.
+                    </div>
+                    <div class="feature-chips">
+                        <span class="chip">⚡ Delta Instant Answers</span>
+                        <span class="chip">🤖 AI Cross-File Analysis</span>
+                        <span class="chip">📊 Interactive Charts</span>
+                        <span class="chip">🔗 Cross-File Queries</span>
+                        <span class="chip">📈 Trend Detection</span>
+                        <span class="chip">🐍 Python 3.14</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-shell">
+                    <textarea id="qinput" rows="1"
+                        placeholder="Ask anything… e.g. 'Compare totals', 'Show a trend chart', 'Find missing values'">
+                </textarea>
+                    <button id="send" onclick="doSend()" title="Send (Enter)">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="input-footer">
+                    <span class="kbd">Enter</span> to send &nbsp;·&nbsp;
+                    <span class="kbd">Shift+Enter</span> for new line
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-root"></div>
+
+    <script>
+        /* ══════════════════════════════════════════════════════
+           CONFIG
+        ══════════════════════════════════════════════════════ */
+        const PALETTE = [
+            '#7C5CFF', '#22D3EE', '#F59E0B', '#10B981',
+            '#F43F5E', '#A78BFA', '#38BDF8', '#34D399', '#FB923C'
+        ];
+
+        marked.use({ breaks: true, gfm: true });
+
+        /* ══════════════════════════════════════════════════════
+           SESSION
+        ══════════════════════════════════════════════════════ */
+        let SID = localStorage.getItem('datalens_sid');
+        if (!SID) { SID = crypto.randomUUID(); localStorage.setItem('datalens_sid', SID); }
+
+        let files = [];
+        let chartN = 0;
+
+        /* ══════════════════════════════════════════════════════
+           INIT
+        ══════════════════════════════════════════════════════ */
+        async function init() {
+            try {
+                const r = await fetch(`/api/files?session_id=${SID}`);
+                if (r.ok) { files = (await r.json()).files || []; renderFiles(); }
+            } catch (_) { }
+            setupDrop();
+            setupInput();
+        }
+
+        /* ══════════════════════════════════════════════════════
+           DRAG & DROP
+        ══════════════════════════════════════════════════════ */
+        function setupDrop() {
+            const zone = document.getElementById('drop-zone');
+            const inp = document.getElementById('file-input');
+
+            zone.addEventListener('click', () => inp.click());
+            inp.addEventListener('change', () => uploadFiles([...inp.files]));
+
+            zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+            zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+                zone.classList.remove('drag-over');
+                uploadFiles([...e.dataTransfer.files]);
+            });
+        }
+
+        /* ══════════════════════════════════════════════════════
+           FILE UPLOAD
+        ══════════════════════════════════════════════════════ */
+        async function uploadFiles(list) {
+            const valid = list.filter(f => /\.(csv|xlsx|xls)$/i.test(f.name));
+            if (!valid.length) { toast('Only CSV and Excel files are supported.', 'err'); return; }
+
+            setProg(true);
+            try {
+                const fd = new FormData();
+                fd.append('session_id', SID);
+                valid.forEach(f => fd.append('files', f));
+
+                const r = await fetch('/api/upload', { method: 'POST', body: fd });
+                const data = await r.json();
+
+                if (r.ok) {
+                    files = data.files || [];
+                    renderFiles();
+                    toast(`✅ ${valid.length} file(s) uploaded`, 'ok');
+                    hideWelcome();
+                } else {
+                    toast(`Upload failed: ${data.detail || r.statusText}`, 'err');
+                }
+            } catch (e) { toast(`Error: ${e.message}`, 'err'); }
+            finally { setProg(false); }
+        }
+
+        function setProg(show) {
+            document.getElementById('upload-prog').classList.toggle('show', show);
+        }
+
+        /* ══════════════════════════════════════════════════════
+           FILE LIST
+        ══════════════════════════════════════════════════════ */
+        function renderFiles() {
+            const list = document.getElementById('file-list');
+            const label = document.getElementById('files-label');
+            const badge = document.getElementById('file-badge');
+            const sugg = document.getElementById('sugg-section');
+            const n = files.length;
+
+            label.textContent = `Datasets (${n})`;
+
+            if (n === 0) {
+                list.innerHTML = '<div class="no-files-msg">No files yet</div>';
+                badge.classList.remove('visible');
+                sugg.style.display = 'none';
+                return;
+            }
+
+            badge.textContent = `${n} file${n > 1 ? 's' : ''}`;
+            badge.classList.add('visible');
+            sugg.style.display = 'block';
+
+            list.innerHTML = files.map(f => {
+                const icon = /\.csv$/i.test(f.name) ? '📄' : '📊';
+                return `
+        <div class="file-card">
+            <span class="file-type-icon">${icon}</span>
+            <div class="file-details">
+                <div class="file-name" title="${esc(f.name)}">${esc(f.name)}</div>
+                <div class="file-meta">${f.rows.toLocaleString()} rows · ${f.columns} cols</div>
+            </div>
+            <button class="file-del" onclick="delFile('${escQ(f.name)}')" title="Remove">✕</button>
+        </div>`;
+            }).join('');
+        }
+
+        async function delFile(name) {
+            try {
+                const r = await fetch(`/api/file?session_id=${SID}&filename=${encodeURIComponent(name)}`, { method: 'DELETE' });
+                const d = await r.json();
+                if (r.ok) { files = d.files; renderFiles(); toast(`Removed ${name}`, 'info'); }
+            } catch (e) { toast('Remove failed.', 'err'); }
+        }
+
+        async function clearSession() {
+            if (!confirm('Clear all files and chat?')) return;
+            await fetch(`/api/clear?session_id=${SID}`, { method: 'DELETE' }).catch(() => { });
+            files = [];
+            renderFiles();
+            resetChat();
+            toast('Session cleared.', 'info');
+        }
+
+        /* ══════════════════════════════════════════════════════
+           INPUT
+        ══════════════════════════════════════════════════════ */
+        function setupInput() {
+            const ta = document.getElementById('qinput');
+            ta.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSend(); }
+            });
+            ta.addEventListener('input', () => {
+                ta.style.height = 'auto';
+                ta.style.height = Math.min(ta.scrollHeight, 110) + 'px';
+            });
+        }
+
+        function setQuery(q) {
+            const ta = document.getElementById('qinput');
+            ta.value = q;
+            ta.focus();
+            ta.style.height = 'auto';
+            ta.style.height = Math.min(ta.scrollHeight, 110) + 'px';
+        }
+
+        /* ══════════════════════════════════════════════════════
+           SEND QUERY
+        ══════════════════════════════════════════════════════ */
+        async function doSend() {
+            const ta = document.getElementById('qinput');
+            const query = ta.value.trim();
+            if (!query) return;
+            if (!files.length) { toast('Upload files first.', 'err'); return; }
+
+            hideWelcome();
+            addUserMsg(query);
+            ta.value = ''; ta.style.height = 'auto';
+
+            const tid = showTyping();
+            document.getElementById('send').disabled = true;
+
+            try {
+                const r = await fetch('/api/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: SID, query })
+                });
+                const data = await r.json();
+                removeTyping(tid);
+                document.getElementById('send').disabled = false;
+
+                if (!r.ok) { addErrMsg(data.detail || 'Request failed.'); return; }
+                addAIMsg(data);
+            } catch (e) {
+                removeTyping(tid);
+                document.getElementById('send').disabled = false;
+                addErrMsg(`Network error: ${e.message}`);
+            }
+        }
+
+        /* ══════════════════════════════════════════════════════
+           MESSAGE RENDERING
+        ══════════════════════════════════════════════════════ */
+        function box() { return document.getElementById('chat-box'); }
+
+        function addUserMsg(text) {
+            const d = document.createElement('div');
+            d.className = 'msg msg-user';
+            d.innerHTML = `<div class="bubble-user">${esc(text)}</div>`;
+            box().appendChild(d);
+            scrollBottom();
+        }
+
+        function addAIMsg(data) {
+            const d = document.createElement('div');
+            d.className = 'msg msg-ai';
+            const cid = `c${++chartN}`;
+
+            let html = '';
+            if (data.delta_used) html += `<span class="delta-badge">⚡ DELTA — Instant Answer</span>`;
+
+            html += `<div class="ai-row">
+        <div class="ai-avatar">🤖</div>
+        <div class="ai-body">
+            <div class="bubble-ai">${marked.parse(data.result || '')}</div>`;
+
+            if (data.chart_data?.datasets?.length) {
+                html += `<div class="chart-wrap"><canvas id="${cid}"></canvas></div>`;
+            }
+            if (data.image_base64) {
+                html += `<img class="res-img" src="data:image/png;base64,${data.image_base64}" alt="Chart">`;
+            }
+
+            html += `</div></div>`;
+            d.innerHTML = html;
+            box().appendChild(d);
+
+            if (data.chart_data?.datasets?.length) renderChart(data.chart_data, cid);
+            scrollBottom();
+        }
+
+        function addErrMsg(msg) {
+            const d = document.createElement('div');
+            d.className = 'msg msg-ai';
+            d.innerHTML = `<div class="ai-row">
+        <div class="ai-avatar" style="background:linear-gradient(135deg,#F43F5E,#FB923C)">⚠️</div>
+        <div class="ai-body"><div class="bubble-error">${esc(msg)}</div></div>
+    </div>`;
+            box().appendChild(d);
+            scrollBottom();
+        }
+
+        /* ══════════════════════════════════════════════════════
+           TYPING INDICATOR
+        ══════════════════════════════════════════════════════ */
+        function showTyping() {
+            const id = 'ty' + Date.now();
+            const d = document.createElement('div');
+            d.className = 'msg msg-ai'; d.id = id;
+            d.innerHTML = `<div class="typing-wrap">
+        <div class="ai-avatar">🤖</div>
+        <div class="typing-dots">
+            <div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div>
+        </div>
+    </div>`;
+            box().appendChild(d);
+            scrollBottom();
+            return id;
+        }
+        function removeTyping(id) { document.getElementById(id)?.remove(); }
+
+        /* ══════════════════════════════════════════════════════
+           CHART.JS RENDERING (for delta layer results)
+        ══════════════════════════════════════════════════════ */
+        function renderChart(cd, cid) {
+            const canvas = document.getElementById(cid);
+            if (!canvas) return;
+            const type = cd.type || 'bar';
+            const labels = (cd.labels || []).map(String);
+
+            const datasets = (cd.datasets || []).map((ds, i) => {
+                const col = PALETTE[i % PALETTE.length];
+                const base = {
+                    label: ds.label || `Series ${i + 1}`,
+                    data: ds.values || [],
+                    borderColor: col,
+                    borderWidth: 2,
+                };
+                if (type === 'bar') {
+                    base.backgroundColor = col + 'BB';
+                    base.borderRadius = 7;
+                    base.borderSkipped = false;
+                } else if (type === 'line') {
+                    base.backgroundColor = col + '22';
+                    base.fill = true;
+                    base.tension = 0.42;
+                    base.pointBackgroundColor = col;
+                    base.pointRadius = 4;
+                    base.pointHoverRadius = 6;
+                } else if (type === 'pie' || type === 'doughnut') {
+                    base.backgroundColor = PALETTE.map(c => c + 'CC');
+                    base.borderColor = PALETTE;
+                } else {
+                    base.backgroundColor = col + 'AA';
+                }
+                return base;
+            });
+
+            new Chart(canvas, {
+                type,
+                data: { labels, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    animation: { duration: 600, easing: 'easeOutQuart' },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#8A9BBF',
+                                font: { family: 'Inter', size: 11 },
+                                boxWidth: 11,
+                                padding: 14,
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#111827',
+                            titleColor: '#E8EDF5',
+                            bodyColor: '#8A9BBF',
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            borderWidth: 1,
+                            padding: 10,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: ctx => {
+                                    const v = ctx.parsed?.y ?? ctx.parsed;
+                                    return ` ${ctx.dataset.label}: ${typeof v === 'number'
+                                            ? v.toLocaleString(undefined, { maximumFractionDigits: 4 })
+                                            : v
+                                        }`;
+                                }
+                            }
+                        }
+                    },
+                    scales: (type !== 'pie' && type !== 'doughnut') ? {
+                        x: {
+                            ticks: { color: '#4A5568', font: { family: 'Inter', size: 10 }, maxRotation: 35 },
+                            grid: { color: 'rgba(255,255,255,0.04)' },
+                            border: { color: 'rgba(255,255,255,0.06)' }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#4A5568',
+                                font: { family: 'Inter', size: 10 },
+                                callback: v => typeof v === 'number' && Math.abs(v) >= 1000
+                                    ? v.toLocaleString() : v
+                            },
+                            grid: { color: 'rgba(255,255,255,0.04)' },
+                            border: { color: 'rgba(255,255,255,0.06)' }
+                        }
+                    } : {}
+                }
+            });
+        }
+
+        /* ══════════════════════════════════════════════════════
+           WELCOME / RESET
+        ══════════════════════════════════════════════════════ */
+        function hideWelcome() {
+            const w = document.getElementById('welcome');
+            if (w) w.style.display = 'none';
+        }
+
+        function resetChat() {
+            const b = box();
+            b.innerHTML = `
+    <div id="welcome">
+        <div class="welcome-glyph">🔬</div>
+        <div class="welcome-title">DataLens AI</div>
+        <div class="welcome-sub">Upload CSV or Excel files and ask any analytical question.</div>
+        <div class="feature-chips">
+            <span class="chip">⚡ Delta Instant Answers</span>
+            <span class="chip">🤖 AI Analysis</span>
+            <span class="chip">📊 Interactive Charts</span>
+            <span class="chip">🐍 Python 3.14</span>
+        </div>
+    </div>`;
+        }
+
+        /* ══════════════════════════════════════════════════════
+           UTILITIES
+        ══════════════════════════════════════════════════════ */
+        function scrollBottom() {
+            const b = box();
+            b.scrollTo({ top: b.scrollHeight, behavior: 'smooth' });
+        }
+
+        function esc(s) {
+            return String(s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        function escQ(s) { return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
+
+        function toast(msg, type = 'info') {
+            const r = document.getElementById('toast-root');
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.textContent = msg;
+            r.appendChild(t);
+            setTimeout(() => {
+                t.style.transition = 'opacity .3s, transform .3s';
+                t.style.opacity = '0';
+                t.style.transform = 'translateX(110%)';
+                setTimeout(() => t.remove(), 310);
+            }, 3600);
+        }
+
+        /* ══════════════════════════════════════════════════════
+           BOOT
+        ══════════════════════════════════════════════════════ */
+        init();
+    </script>
+</body>
+
+</html>

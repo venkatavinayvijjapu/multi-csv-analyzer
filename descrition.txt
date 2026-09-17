@@ -1,0 +1,124 @@
+Description
+
+AI-Driven Performance Comparison for Radio Devices
+
+Requirement: Implement an AI system that compares the performance of Radio A and Radio B across multiple metrics (SNR, EVM, Spectral Efficiency, etc.) using historical datasets. The system should process user queries, evaluate the data, and generate visualizations comparing device performance.
+
+As a user,
+I want to compare the performance of different radio devices over time using historical data,
+So that I can assess improvements or regressions in performance metrics (e.g., SNR, EVM, spectral efficiency, etc.) and visualize the comparison effectively.
+
+Purpose
+
+To compare the performance of two radio devices—such as a legacy model and a newer one- check the datasets that capture their RF signal characteristics under similar conditions. This comparison will help you assess improvements or regressions in aspects like signal quality, stability, and efficiency.
+
+AI Integration - Example
+
+Natural Language Processing (NLP):
+
+Implement NLP models to interpret user queries, such as "Compare Radio Device A with  Radio Device B" to evaluate the performance which one is better.
+
+For example- Radio A-SNR Vs  Radio B SNR  If Radio A  SNR > Radio B SNR then Radio A indicates better signal quality. 
+
+Visualization Tools:
+
+To generate charts and graphs illustrating comparisons.
+
+Acceptance Criteria:
+Metric Evaluation:
+
+The comparison should include the following metrics: SNR, EVM, Spectral Efficiency, Frequency and Phase Stability, BER, and Power Consumption.
+
+The system should return performance scores for each metric for both devices (Radio A vs. Radio B).
+
+Data Processing:
+
+Ensure that the data for Radio A and Radio B is retrieved and processed correctly.
+
+Ensure that historical datasets are used to evaluate performance over time.
+
+AI-powered Comparison:
+
+The AI should process user queries like "Compare Radio Device A with Radio Device B" and return comparisons for the selected metrics.
+
+If one device performs better than the other (e.g., higher SNR, lower EVM), the AI should highlight this with clear, concise output (e.g., "Radio A has better signal quality than Radio B").
+
+Visualization:
+
+The system should generate clear visualizations (e.g., bar charts, line graphs, scatter plots) comparing the two devices on all metrics.
+
+Visualizations should show the performance trend over time, highlighting significant improvements or regressions.
+
+The comparison should be presented side-by-side for easy analysis.
+
+User Interaction:
+
+Users should be able to input a natural language query (e.g., "Compare SNR of Radio A and Radio B") and receive a corresponding visual comparison.
+
+Feedback Loop:
+
+Users should be able to refine their queries and get updated visualizations.
+
+The system should allow the user to toggle between different devices and metrics in the visualization.
+
+Metric Evaluation (Details)
+
+Signal-to-Noise Ratio (SNR): Indicates signal clarity; higher values suggest better performance.
+
+Error Vector Magnitude (EVM): Measures modulation accuracy; lower EVM denotes higher fidelity.
+
+Spectral Efficiency: Assesses how effectively the device utilizes bandwidth.
+
+Frequency and Phase Stability: Evaluates the consistency of signal frequency and phase over time.
+
+Bit Error Rate (BER): Determines the rate of errors in transmitted bits; lower BER indicates better reliability.
+
+Power Consumption: Analyzes energy efficiency during operation.
+
+@Venkata Vinay Vijjapu  
+
+AI Query Processing:
+
+Integrate NLP to interpret natural language queries (e.g., "Compare SNR of Radio A and Radio B").
+
+Develop AI logic to compare devices based on SNR, EVM, and other metrics.
+
+Visualization:
+
+Implement data visualization tools (e.g., using Python libraries like Matplotlib, Plotly, or AI-powered tools like Power BI or Tableau).
+
+Generate charts to show comparative results.
+
+User Interface for Query Input:
+
+Design a simple UI where users can input comparison queries.
+
+Integrate query results with visualizations.
+
+Testing:
+
+Verify that the system correctly compares devices across all required metrics.
+
+Test the NLP model's ability to interpret user queries and return the expected output.
+
+Example User Query and Expected Output
+User Query:
+"Compare Radio A and Radio B based on SNR and BER “
+
+Expected Output:
+Performance Evaluation:
+
+SNR Comparison: Show if Radio A’s SNR is higher than Radio B's, indicating better signal quality.
+
+BER Comparison: Compare Bit Error Rates, showing which device has fewer errors.
+
+Visual Output:
+
+Bar Chart for SNR: Side-by-side bars showing Radio A’s and Radio B’s SNR values over time.
+
+Line Graph for BER: Display how the BER for each device evolves, with a clear indication of the device with lower errors.
+
+Example AI-Generated Response:
+"Radio A has consistently better SNR than Radio B, indicating superior signal clarity. Radio B has a higher BER, which suggests it is more prone to transmission errors."
+
+Attached the datasets for reference

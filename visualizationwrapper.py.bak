@@ -1,0 +1,73 @@
+from typing import Any, Dict, List, Optional, Union
+from langchain_core.callbacks import CallbackManagerForToolRun
+from langchain_core.tools import BaseTool
+import pandas as pd
+import requests
+import streamlit as st
+from pydantic import BaseModel, ConfigDict
+import base64
+
+
+class DataVisualizationAPIWrapper(BaseModel):
+    api_url: str = "http://127.0.0.1:8000"
+    model_config = ConfigDict(extra="forbid")
+
+    def _visualize(self, dfs: Dict[str, pd.DataFrame], query: str) -> str:
+        """Encode all DataFrames and send to FastAPI /visualize endpoint."""
+        try:
+            files_payload = []
+            for name, df in dfs.items():
+                data_b64 = base64.b64encode(
+                    df.to_csv(index=False).encode("utf-8")
+                ).decode("utf-8")
+                files_payload.append({"name": name, "data_base64": data_b64})
+
+            payload = {"files": files_payload, "query": query}
+            response = requests.post(
+                f"{self.api_url}/visualize", json=payload, timeout=90
+            )
+
+            if response.status_code == 200:
+                img_base64 = response.json().get("image_base64", "")
+                if img_base64:
+                    return img_base64
+                return "Error: No image data returned"
+            return (
+                f"Error: Visualization failed. "
+                f"Status: {response.status_code}, Message: {response.text[:300]}"
+            )
+        except Exception as e:
+            return f"Error: Visualization request failed: {e}"
+
+    def run(self, inputs: Union[str, Dict[str, Any]]) -> str:
+        if isinstance(inputs, str):
+            inputs = {"input": inputs}
+        query = inputs.get("input") or inputs.get("query") or ""
+        dfs: Dict[str, pd.DataFrame] = st.session_state.get("dataframes", {})
+        if not dfs:
+            return "Error: No datasets found in session. Please upload files first."
+        return self._visualize(dfs, query)
+
+
+class DataVisualizationTool(BaseTool):
+    name: str = "data_visualization_tool"
+    description: str = (
+        "Generates charts and visualizations from one or more uploaded datasets. "
+        "Input should be a natural language string describing the visualization request. "
+        "Returns a base64-encoded PNG image. "
+        "Use for: line charts, bar charts, scatter plots, histograms, trend charts, comparisons."
+    )
+    api_wrapper: DataVisualizationAPIWrapper
+
+    def _run(
+        self,
+        *args,
+        run_manager: Optional[CallbackManagerForToolRun] = None,
+        **kwargs,
+    ) -> str:
+        query = kwargs.get("input") or kwargs.get("kwargs", {}).get("input")
+        if not query and args:
+            query = str(args[0])
+        if not query:
+            return "Error: No valid input query found."
+        return self.api_wrapper.run({"input": query})
