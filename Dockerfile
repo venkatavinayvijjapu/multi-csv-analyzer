@@ -24,5 +24,5 @@ COPY . .
 # Expose port (AWS App Runner defaults to 8080)
 EXPOSE 8080
 
-# Run with uvicorn
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "2"]
+# Run with uvicorn (Single worker required for in-memory session store)
+CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8080"]
