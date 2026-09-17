@@ -130,6 +130,7 @@ Generate Python matplotlib code:
 - Dark theme: set figure face color to '#0D1117', axes face color to '#161B22'
 - Use this color palette: ['#8B5CF6','#06B6D4','#F59E0B','#10B981','#EF4444','#A78BFA','#38BDF8']
 - Add title, axis labels, and legend.
+- KEEP IT SIMPLE. Do NOT add data labels or text annotations (avoid plt.text, ax.annotate, xytext, padding).
 - Use plt.tight_layout()
 
 End code with EXACTLY:
