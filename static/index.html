@@ -1134,8 +1134,21 @@
         /* ══════════════════════════════════════════════════════
            SESSION
         ══════════════════════════════════════════════════════ */
+        function generateId() {
+            if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+                return crypto.randomUUID();
+            }
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+            });
+        }
+
         let SID = localStorage.getItem('datalens_sid');
-        if (!SID) { SID = crypto.randomUUID(); localStorage.setItem('datalens_sid', SID); }
+        if (!SID || SID === 'null') { 
+            SID = generateId(); 
+            localStorage.setItem('datalens_sid', SID); 
+        }
 
         let files = [];
         let chartN = 0;
