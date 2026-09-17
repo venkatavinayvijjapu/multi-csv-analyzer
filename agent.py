@@ -197,7 +197,7 @@ def visualization_node(state: AgentState) -> dict:
     img_b64, error = run_visualization(dfs, state["query"])
 
     if img_b64:
-        return {"image_base64": img_b64, "result": "",
+        return {"image_base64": img_b64, "result": "✅ Chart generated.",
                 "intent": "visualization", "chart_data": None, "delta_used": False}
     return {"result": f"⚠️ Could not generate chart: {error}",
             "intent": "visualization", "image_base64": None,
