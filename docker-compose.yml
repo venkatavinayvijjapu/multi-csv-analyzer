@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  datalens-ai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: datalens-ai:4.0.0
+    container_name: datalens-ai
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env                     # copy .env.example → .env and fill in your keys
+    environment:
+      # Override any .env values here for local dev
+      LOG_LEVEL: "DEBUG"
+      SESSION_TTL_SECONDS: "7200"
+      MAX_FILE_SIZE_MB: "50"
+      MAX_FILES_PER_SESSION: "20"
+      MAX_ROWS_PER_FILE: "500000"
+      QUERY_TIMEOUT_SECONDS: "30"
+      MAX_RETRIES: "2"
+    volumes:
+      # Mount logs directory so you can tail them locally
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8080/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    # Soft memory limit (adjust based on your expected data sizes)
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+
+  # ── Optional: Prometheus scraping ──────────────────────────────────────────
+  # Uncomment to enable local metrics scraping
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  #   depends_on:
+  #     - datalens-ai

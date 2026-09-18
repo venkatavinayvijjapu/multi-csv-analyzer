@@ -1,0 +1,405 @@
+2026-09-18 10:37:00 [16c38d6b] INFO     api — GET /api/health status=200 latency=4ms
+2026-09-18 10:37:00 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/health "HTTP/1.1 200 OK"
+2026-09-18 10:37:00 [1e1c6ebc] INFO     core.data_quality — Profiled 'employees.csv': 3 rows, 4 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:37:00 [1e1c6ebc] INFO     session_store — Session created: 91565112
+2026-09-18 10:37:00 [1e1c6ebc] INFO     session_store — Session 91565112: stored 'employees.csv' shape=(3, 4)
+2026-09-18 10:37:00 [1e1c6ebc] INFO     api — Session 91565112: stored 'employees.csv' (3, 4)
+2026-09-18 10:37:00 [1e1c6ebc] INFO     api — POST /api/upload status=200 latency=12ms
+2026-09-18 10:37:00 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 200 OK"
+2026-09-18 10:37:00 [c919c418] INFO     api — POST /api/upload status=400 latency=1ms
+2026-09-18 10:37:00 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 400 Bad Request"
+2026-09-18 10:37:00 [de4f9bb9] INFO     api — POST /api/upload status=400 latency=1ms
+2026-09-18 10:37:00 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 400 Bad Request"
+2026-09-18 10:37:00 [241f5553] INFO     api — GET /api/files status=200 latency=0ms
+2026-09-18 10:37:00 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/files?session_id=a204f8f1-ce41-480a-8c43-50648b80e7c9 "HTTP/1.1 200 OK"
+2026-09-18 10:37:00 [014134c3] INFO     core.data_quality — Profiled 'emp.csv': 3 rows, 4 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:37:00 [014134c3] INFO     session_store — Session created: 52b4e3a1
+2026-09-18 10:37:00 [014134c3] INFO     session_store — Session 52b4e3a1: stored 'emp.csv' shape=(3, 4)
+2026-09-18 10:37:00 [014134c3] INFO     api — Session 52b4e3a1: stored 'emp.csv' (3, 4)
+2026-09-18 10:37:00 [014134c3] INFO     api — POST /api/upload status=200 latency=10ms
+2026-09-18 10:37:00 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 200 OK"
+2026-09-18 10:37:00 [61c1b5b2] INFO     api — GET /api/files status=200 latency=1ms
+2026-09-18 10:37:00 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/files?session_id=52b4e3a1-5f89-47dd-8dc7-eca1d3ce92d3 "HTTP/1.1 200 OK"
+2026-09-18 10:37:00 [fdf4c744] INFO     core.data_quality — Profiled 'emp.csv': 3 rows, 4 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:37:00 [fdf4c744] INFO     session_store — Session created: bba1783f
+2026-09-18 10:37:00 [fdf4c744] INFO     session_store — Session bba1783f: stored 'emp.csv' shape=(3, 4)
+2026-09-18 10:37:00 [fdf4c744] INFO     api — Session bba1783f: stored 'emp.csv' (3, 4)
+2026-09-18 10:37:00 [fdf4c744] INFO     api — POST /api/upload status=200 latency=9ms
+2026-09-18 10:37:00 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 200 OK"
+2026-09-18 10:37:00 [9dcbe0e9] INFO     session_store — Session bba1783f: cleared
+2026-09-18 10:37:00 [9dcbe0e9] INFO     api — Session bba1783f: cleared
+2026-09-18 10:37:00 [9dcbe0e9] INFO     api — DELETE /api/clear status=200 latency=1ms
+2026-09-18 10:37:00 [-] INFO     httpx2 — HTTP Request: DELETE http://testserver/api/clear?session_id=bba1783f-fc2d-421a-9df2-02a6376b4af6 "HTTP/1.1 200 OK"
+2026-09-18 10:37:00 [d2d406c2] INFO     api — GET /api/files status=200 latency=0ms
+2026-09-18 10:37:00 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/files?session_id=bba1783f-fc2d-421a-9df2-02a6376b4af6 "HTTP/1.1 200 OK"
+2026-09-18 10:37:00 [cb43f9aa] INFO     core.data_quality — Profiled 'emp.csv': 3 rows, 4 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:37:00 [cb43f9aa] INFO     session_store — Session created: 9b7df105
+2026-09-18 10:37:00 [cb43f9aa] INFO     session_store — Session 9b7df105: stored 'emp.csv' shape=(3, 4)
+2026-09-18 10:37:00 [cb43f9aa] INFO     api — Session 9b7df105: stored 'emp.csv' (3, 4)
+2026-09-18 10:37:00 [cb43f9aa] INFO     api — POST /api/upload status=200 latency=9ms
+2026-09-18 10:37:00 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 200 OK"
+2026-09-18 10:37:00 [58635580] INFO     api — Session 9b7df105: removed 'emp.csv'
+2026-09-18 10:37:00 [58635580] INFO     api — DELETE /api/file status=200 latency=0ms
+2026-09-18 10:37:00 [-] INFO     httpx2 — HTTP Request: DELETE http://testserver/api/file?session_id=9b7df105-b115-44ac-9312-ff78d6edb974&filename=emp.csv "HTTP/1.1 200 OK"
+2026-09-18 10:37:01 [dcb2c76f] INFO     api — POST /api/query status=400 latency=1085ms
+2026-09-18 10:37:01 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/query "HTTP/1.1 400 Bad Request"
+2026-09-18 10:37:01 [8a5ff8f3] INFO     core.data_quality — Profiled 'emp.csv': 3 rows, 4 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:37:01 [8a5ff8f3] INFO     session_store — Session created: 671f8335
+2026-09-18 10:37:01 [8a5ff8f3] INFO     session_store — Session 671f8335: stored 'emp.csv' shape=(3, 4)
+2026-09-18 10:37:01 [8a5ff8f3] INFO     api — Session 671f8335: stored 'emp.csv' (3, 4)
+2026-09-18 10:37:01 [8a5ff8f3] INFO     api — POST /api/upload status=200 latency=8ms
+2026-09-18 10:37:01 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 200 OK"
+2026-09-18 10:37:01 [716d5481] INFO     api — POST /api/query status=400 latency=1ms
+2026-09-18 10:37:01 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/query "HTTP/1.1 400 Bad Request"
+2026-09-18 10:37:01 [b26ead69] INFO     core.data_quality — Profiled 'emp.csv': 3 rows, 4 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:37:01 [b26ead69] INFO     session_store — Session created: 5e54940e
+2026-09-18 10:37:01 [b26ead69] INFO     session_store — Session 5e54940e: stored 'emp.csv' shape=(3, 4)
+2026-09-18 10:37:01 [b26ead69] INFO     api — Session 5e54940e: stored 'emp.csv' (3, 4)
+2026-09-18 10:37:01 [b26ead69] INFO     api — POST /api/upload status=200 latency=9ms
+2026-09-18 10:37:01 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 200 OK"
+2026-09-18 10:37:01 [b2a349d9] INFO     api — GET /api/session/info status=200 latency=3ms
+2026-09-18 10:37:01 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/session/info?session_id=5e54940e-ebe8-4c26-a369-2ff76cf4f67a "HTTP/1.1 200 OK"
+2026-09-18 10:37:01 [bd95cc11] INFO     api — POST /api/session/extend status=200 latency=1ms
+2026-09-18 10:37:01 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/session/extend?session_id=5db5ce32-3c02-4830-8a3c-6d5ca68690a3 "HTTP/1.1 200 OK"
+2026-09-18 10:37:01 [-] INFO     session_store — Session created: fdd90522
+2026-09-18 10:37:01 [ba729a35] INFO     api — Session fdd90522: history cleared
+2026-09-18 10:37:01 [ba729a35] INFO     api — DELETE /api/history status=200 latency=1ms
+2026-09-18 10:37:01 [-] INFO     httpx2 — HTTP Request: DELETE http://testserver/api/history?session_id=fdd90522-1470-4988-aea3-99f776ecd36c "HTTP/1.1 200 OK"
+2026-09-18 10:37:01 [-] INFO     session_store — Session created: 8acc3176
+2026-09-18 10:37:01 [fd2aa4f0] INFO     api — GET /api/history status=200 latency=1ms
+2026-09-18 10:37:01 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/history?session_id=8acc3176-2101-4ae4-98ce-f14a2cb6fded "HTTP/1.1 200 OK"
+2026-09-18 10:37:01 [1d9fc59b] INFO     api — GET /api/provenance status=200 latency=0ms
+2026-09-18 10:37:01 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/provenance?session_id=fd8843ce-0f7b-487a-b9b4-a6198d8338a1 "HTTP/1.1 200 OK"
+2026-09-18 10:37:01 [d176a79d] INFO     api — GET /api/metrics status=200 latency=0ms
+2026-09-18 10:37:01 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/metrics "HTTP/1.1 200 OK"
+2026-09-18 10:37:01 [f7461ad3] INFO     api — GET /api/prompts status=200 latency=1ms
+2026-09-18 10:37:01 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/prompts "HTTP/1.1 200 OK"
+2026-09-18 10:37:01 [cffb4a63] INFO     api — GET /api/health status=200 latency=0ms
+2026-09-18 10:37:01 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/health "HTTP/1.1 200 OK"
+2026-09-18 10:37:01 [test-rid-123] INFO     api — GET /api/health status=200 latency=0ms
+2026-09-18 10:37:01 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/health "HTTP/1.1 200 OK"
+2026-09-18 10:45:17 [40031883] INFO     api — GET / status=200 latency=78ms
+2026-09-18 10:45:17 [7edc3a33] INFO     api — GET /api/files status=200 latency=2ms
+2026-09-18 10:45:18 [2675c732] INFO     api — GET /favicon.ico status=404 latency=1ms
+2026-09-18 10:45:25 [dfabda9d] INFO     core.data_quality — Profiled 'expenses.csv': 12 rows, 5 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:45:25 [dfabda9d] INFO     session_store — Session created: ad7ecc6a
+2026-09-18 10:45:25 [dfabda9d] INFO     session_store — Session ad7ecc6a: stored 'expenses.csv' shape=(12, 5)
+2026-09-18 10:45:25 [dfabda9d] INFO     api — Session ad7ecc6a: stored 'expenses.csv' (12, 5)
+2026-09-18 10:45:25 [dfabda9d] INFO     core.data_quality — Profiled 'customers.csv': 10 rows, 7 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:45:25 [dfabda9d] INFO     session_store — Session ad7ecc6a: stored 'customers.csv' shape=(10, 7)
+2026-09-18 10:45:25 [dfabda9d] INFO     api — Session ad7ecc6a: stored 'customers.csv' (10, 7)
+2026-09-18 10:45:25 [dfabda9d] INFO     core.data_quality — Profiled 'sales.csv': 12 rows, 7 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:45:25 [dfabda9d] INFO     session_store — Session ad7ecc6a: stored 'sales.csv' shape=(12, 7)
+2026-09-18 10:45:25 [dfabda9d] INFO     api — Session ad7ecc6a: stored 'sales.csv' (12, 7)
+2026-09-18 10:45:25 [dfabda9d] INFO     api — POST /api/upload status=200 latency=141ms
+2026-09-18 10:45:31 [d69b4df7] INFO     api — Session ad7ecc6a: query='Compare average values across all files'
+2026-09-18 10:45:35 [d69b4df7] INFO     httpx2 — HTTP Request: POST https://api.experientiallabs.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-18 10:45:35 [d69b4df7] INFO     agent — Intent [analysis]: Compare average values across all files
+2026-09-18 10:45:35 [d69b4df7] INFO     agent — Analysis node: Compare average values across all files
+2026-09-18 10:45:35 [d69b4df7] INFO     api_endpoints.analysis — Analysis LLM call: Compare average values across all files
+2026-09-18 10:45:55 [d69b4df7] INFO     httpx2 — HTTP Request: POST https://api.experientiallabs.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-18 10:45:55 [d69b4df7] INFO     api_endpoints.analysis — Analysis done: success=True retried=False latency=19496ms result_len=749
+2026-09-18 10:45:55 [d69b4df7] INFO     api — POST /api/query status=200 latency=25909ms
+2026-09-18 10:46:21 [6a2533e3] INFO     api — Session ad7ecc6a: query='Show revenue by region as a bar chart.'
+2026-09-18 10:46:22 [6a2533e3] INFO     httpx2 — HTTP Request: POST https://api.experientiallabs.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-18 10:46:22 [6a2533e3] INFO     agent — Intent [visualization]: Show revenue by region as a bar chart.
+2026-09-18 10:46:22 [6a2533e3] INFO     agent — Visualization node: Show revenue by region as a bar chart.
+2026-09-18 10:46:22 [6a2533e3] INFO     api_endpoints.visualize — Visualization LLM call: Show revenue by region as a bar chart.
+2026-09-18 10:46:28 [6a2533e3] INFO     httpx2 — HTTP Request: POST https://api.experientiallabs.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-18 10:46:30 [6a2533e3] INFO     api_endpoints.visualize — Visualization done: success=True retried=False latency=7477ms
+2026-09-18 10:46:30 [6a2533e3] INFO     api — POST /api/query status=200 latency=8699ms
+2026-09-18 10:46:37 [30750a56] INFO     api — Session ad7ecc6a: query='Show monthly revenue as a line chart.'
+2026-09-18 10:46:38 [30750a56] INFO     httpx2 — HTTP Request: POST https://api.experientiallabs.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-18 10:46:38 [30750a56] INFO     agent — Intent [visualization]: Show monthly revenue as a line chart.
+2026-09-18 10:46:38 [30750a56] INFO     agent — Visualization node: Show monthly revenue as a line chart.
+2026-09-18 10:46:38 [30750a56] INFO     api_endpoints.visualize — Visualization LLM call: Show monthly revenue as a line chart.
+2026-09-18 10:46:46 [30750a56] INFO     httpx2 — HTTP Request: POST https://api.experientiallabs.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-18 10:46:46 [-] INFO     matplotlib.category — Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2026-09-18 10:46:46 [-] INFO     matplotlib.category — Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2026-09-18 10:46:48 [30750a56] INFO     api_endpoints.visualize — Visualization done: success=True retried=False latency=10441ms
+2026-09-18 10:46:48 [30750a56] INFO     api — POST /api/query status=200 latency=11644ms
+2026-09-18 10:47:05 [5e787388] INFO     api — GET / status=200 latency=2ms
+2026-09-18 10:47:05 [7ced80cc] INFO     api — GET /api/files status=200 latency=11ms
+2026-09-18 10:47:14 [c8685ee3] INFO     session_store — Session ad7ecc6a: cleared
+2026-09-18 10:47:14 [c8685ee3] INFO     api — Session ad7ecc6a: cleared
+2026-09-18 10:47:14 [c8685ee3] INFO     api — DELETE /api/clear status=200 latency=3ms
+2026-09-18 10:55:32 [9e6bbc47] INFO     api — GET /api/health status=200 latency=11ms
+2026-09-18 10:55:32 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/health "HTTP/1.1 200 OK"
+2026-09-18 10:55:32 [de547a89] INFO     core.data_quality — Profiled 'employees.csv': 3 rows, 4 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:55:32 [de547a89] INFO     session_store — Session created: bac6c46c
+2026-09-18 10:55:32 [de547a89] INFO     session_store — Session bac6c46c: stored 'employees.csv' shape=(3, 4)
+2026-09-18 10:55:32 [de547a89] INFO     api — Session bac6c46c: stored 'employees.csv' (3, 4)
+2026-09-18 10:55:32 [de547a89] INFO     api — POST /api/upload status=200 latency=45ms
+2026-09-18 10:55:32 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 200 OK"
+2026-09-18 10:55:32 [cf975f1a] INFO     api — POST /api/upload status=400 latency=4ms
+2026-09-18 10:55:32 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 400 Bad Request"
+2026-09-18 10:55:32 [7a67f2b1] INFO     api — POST /api/upload status=400 latency=3ms
+2026-09-18 10:55:32 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 400 Bad Request"
+2026-09-18 10:55:32 [6fd11820] INFO     api — GET /api/files status=200 latency=2ms
+2026-09-18 10:55:32 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/files?session_id=be211164-8e48-4402-9796-6f8f63dfc157 "HTTP/1.1 200 OK"
+2026-09-18 10:55:32 [65c29412] INFO     core.data_quality — Profiled 'emp.csv': 3 rows, 4 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:55:32 [65c29412] INFO     session_store — Session created: 90cb8903
+2026-09-18 10:55:32 [65c29412] INFO     session_store — Session 90cb8903: stored 'emp.csv' shape=(3, 4)
+2026-09-18 10:55:32 [65c29412] INFO     api — Session 90cb8903: stored 'emp.csv' (3, 4)
+2026-09-18 10:55:32 [65c29412] INFO     api — POST /api/upload status=200 latency=36ms
+2026-09-18 10:55:32 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 200 OK"
+2026-09-18 10:55:32 [351eb329] INFO     api — GET /api/files status=200 latency=3ms
+2026-09-18 10:55:32 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/files?session_id=90cb8903-76e4-42b6-96e6-84a45c62b346 "HTTP/1.1 200 OK"
+2026-09-18 10:55:32 [fa046a76] INFO     core.data_quality — Profiled 'emp.csv': 3 rows, 4 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:55:32 [fa046a76] INFO     session_store — Session created: d1cc1e4f
+2026-09-18 10:55:32 [fa046a76] INFO     session_store — Session d1cc1e4f: stored 'emp.csv' shape=(3, 4)
+2026-09-18 10:55:32 [fa046a76] INFO     api — Session d1cc1e4f: stored 'emp.csv' (3, 4)
+2026-09-18 10:55:32 [fa046a76] INFO     api — POST /api/upload status=200 latency=39ms
+2026-09-18 10:55:32 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 200 OK"
+2026-09-18 10:55:32 [c800cef0] INFO     session_store — Session d1cc1e4f: cleared
+2026-09-18 10:55:32 [c800cef0] INFO     api — Session d1cc1e4f: cleared
+2026-09-18 10:55:32 [c800cef0] INFO     api — DELETE /api/clear status=200 latency=3ms
+2026-09-18 10:55:32 [-] INFO     httpx2 — HTTP Request: DELETE http://testserver/api/clear?session_id=d1cc1e4f-0cdd-4195-a354-35b4d95d535d "HTTP/1.1 200 OK"
+2026-09-18 10:55:32 [a2ef98a0] INFO     api — GET /api/files status=200 latency=1ms
+2026-09-18 10:55:32 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/files?session_id=d1cc1e4f-0cdd-4195-a354-35b4d95d535d "HTTP/1.1 200 OK"
+2026-09-18 10:55:32 [4b84df29] INFO     core.data_quality — Profiled 'emp.csv': 3 rows, 4 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:55:32 [4b84df29] INFO     session_store — Session created: 293c12a8
+2026-09-18 10:55:32 [4b84df29] INFO     session_store — Session 293c12a8: stored 'emp.csv' shape=(3, 4)
+2026-09-18 10:55:32 [4b84df29] INFO     api — Session 293c12a8: stored 'emp.csv' (3, 4)
+2026-09-18 10:55:32 [4b84df29] INFO     api — POST /api/upload status=200 latency=34ms
+2026-09-18 10:55:32 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 200 OK"
+2026-09-18 10:55:32 [440317e9] INFO     api — Session 293c12a8: removed 'emp.csv'
+2026-09-18 10:55:32 [440317e9] INFO     api — DELETE /api/file status=200 latency=3ms
+2026-09-18 10:55:32 [-] INFO     httpx2 — HTTP Request: DELETE http://testserver/api/file?session_id=293c12a8-10cc-4b0f-8cbe-201019fd4f14&filename=emp.csv "HTTP/1.1 200 OK"
+2026-09-18 10:55:34 [db973d2f] INFO     api — POST /api/query status=400 latency=2272ms
+2026-09-18 10:55:34 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/query "HTTP/1.1 400 Bad Request"
+2026-09-18 10:55:34 [61a5aa0e] INFO     core.data_quality — Profiled 'emp.csv': 3 rows, 4 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:55:34 [61a5aa0e] INFO     session_store — Session created: 9832f988
+2026-09-18 10:55:34 [61a5aa0e] INFO     session_store — Session 9832f988: stored 'emp.csv' shape=(3, 4)
+2026-09-18 10:55:34 [61a5aa0e] INFO     api — Session 9832f988: stored 'emp.csv' (3, 4)
+2026-09-18 10:55:34 [61a5aa0e] INFO     api — POST /api/upload status=200 latency=33ms
+2026-09-18 10:55:34 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 200 OK"
+2026-09-18 10:55:34 [5f45db27] INFO     api — POST /api/query status=400 latency=2ms
+2026-09-18 10:55:34 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/query "HTTP/1.1 400 Bad Request"
+2026-09-18 10:55:34 [09cc8a12] INFO     core.data_quality — Profiled 'emp.csv': 3 rows, 4 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:55:34 [09cc8a12] INFO     session_store — Session created: da0f9fb6
+2026-09-18 10:55:34 [09cc8a12] INFO     session_store — Session da0f9fb6: stored 'emp.csv' shape=(3, 4)
+2026-09-18 10:55:34 [09cc8a12] INFO     api — Session da0f9fb6: stored 'emp.csv' (3, 4)
+2026-09-18 10:55:34 [09cc8a12] INFO     api — POST /api/upload status=200 latency=38ms
+2026-09-18 10:55:34 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 200 OK"
+2026-09-18 10:55:34 [ce7566f0] INFO     api — GET /api/session/info status=200 latency=5ms
+2026-09-18 10:55:34 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/session/info?session_id=da0f9fb6-6c87-4eb1-9b95-5443a928872f "HTTP/1.1 200 OK"
+2026-09-18 10:55:34 [481d8736] INFO     api — POST /api/session/extend status=200 latency=1ms
+2026-09-18 10:55:34 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/session/extend?session_id=646c90c8-62bc-4418-9f29-e89a7f2e9f3d "HTTP/1.1 200 OK"
+2026-09-18 10:55:34 [-] INFO     session_store — Session created: 05a0a317
+2026-09-18 10:55:34 [d221ccda] INFO     api — Session 05a0a317: history cleared
+2026-09-18 10:55:34 [d221ccda] INFO     api — DELETE /api/history status=200 latency=3ms
+2026-09-18 10:55:35 [-] INFO     httpx2 — HTTP Request: DELETE http://testserver/api/history?session_id=05a0a317-e54d-4a9b-9c45-e9eecc639709 "HTTP/1.1 200 OK"
+2026-09-18 10:55:35 [-] INFO     session_store — Session created: 14394a94
+2026-09-18 10:55:35 [1d87458f] INFO     api — GET /api/history status=200 latency=2ms
+2026-09-18 10:55:35 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/history?session_id=14394a94-536d-47f9-91f2-e3783be8a733 "HTTP/1.1 200 OK"
+2026-09-18 10:55:35 [400aca8a] INFO     api — GET /api/provenance status=200 latency=2ms
+2026-09-18 10:55:35 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/provenance?session_id=6ace3278-2264-4e84-a4a6-6dc640c342cf "HTTP/1.1 200 OK"
+2026-09-18 10:55:35 [d1edd1e9] INFO     api — GET /api/metrics status=200 latency=1ms
+2026-09-18 10:55:35 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/metrics "HTTP/1.1 200 OK"
+2026-09-18 10:55:35 [d2071f52] INFO     api — GET /api/prompts status=200 latency=2ms
+2026-09-18 10:55:35 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/prompts "HTTP/1.1 200 OK"
+2026-09-18 10:55:35 [d3cde902] INFO     api — GET /api/health status=200 latency=1ms
+2026-09-18 10:55:35 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/health "HTTP/1.1 200 OK"
+2026-09-18 10:55:35 [test-rid-123] INFO     api — GET /api/health status=200 latency=1ms
+2026-09-18 10:55:35 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/health "HTTP/1.1 200 OK"
+2026-09-18 10:55:35 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: forbidden import 'os'"]
+2026-09-18 10:55:35 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: forbidden import 'subprocess'"]
+2026-09-18 10:55:35 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: forbidden import 'sys'"]
+2026-09-18 10:55:35 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: forbidden 'from os import …'"]
+2026-09-18 10:55:35 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: forbidden call 'open()'"]
+2026-09-18 10:55:35 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: forbidden call 'eval()'"]
+2026-09-18 10:55:35 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: forbidden call 'exec()'"]
+2026-09-18 10:55:35 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: forbidden call 'compile()'"]
+2026-09-18 10:55:35 [-] WARNING  core.code_validator — Code validation found 2 issue(s): ["Line 1: suspicious dunder attribute access '.__subclasses__'", "Line 1: suspicious dunder attribute access '.__class__'"]
+2026-09-18 10:55:35 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: suspicious dunder name reference '__builtins__'"]
+2026-09-18 10:55:35 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: forbidden import 'os'"]
+2026-09-18 10:55:35 [-] INFO     core.data_quality — Profiled 'test.csv': 5 rows, 4 cols, 0 dups, 2 nulls, 0 warnings
+2026-09-18 10:55:35 [-] INFO     core.data_quality — Profiled 'test.csv': 5 rows, 4 cols, 0 dups, 2 nulls, 0 warnings
+2026-09-18 10:55:35 [-] INFO     core.data_quality — Profiled 'dup.csv': 3 rows, 2 cols, 1 dups, 0 nulls, 1 warnings
+2026-09-18 10:55:35 [-] INFO     core.data_quality — Profiled 'test.csv': 5 rows, 4 cols, 0 dups, 2 nulls, 0 warnings
+2026-09-18 10:55:35 [-] INFO     core.data_quality — Profiled 'test.csv': 5 rows, 4 cols, 0 dups, 2 nulls, 0 warnings
+2026-09-18 10:55:35 [-] INFO     core.data_quality — Profiled 'outlier.csv': 9 rows, 1 cols, 5 dups, 0 nulls, 2 warnings
+2026-09-18 10:55:35 [-] INFO     core.data_quality — Profiled 'nulls.csv': 100 rows, 1 cols, 98 dups, 80 nulls, 3 warnings
+2026-09-18 10:55:35 [-] WARNING  core.sandbox — Sandbox execution error: name 'open' is not defined
+2026-09-18 10:55:35 [-] WARNING  core.sandbox — Sandbox execution error: Import of module 'os' is not allowed in this sandbox.
+2026-09-18 10:55:35 [-] WARNING  core.sandbox — Sandbox execution error: name 'eval' is not defined
+2026-09-18 10:55:35 [-] WARNING  core.sandbox — Sandbox execution error: name 'exec' is not defined
+2026-09-18 10:55:37 [-] WARNING  core.sandbox — Code execution timed out after 2s
+2026-09-18 10:55:39 [-] INFO     session_store — Session created: test-set
+2026-09-18 10:55:39 [-] INFO     session_store — Session test-set: stored 'data.csv' shape=(3, 2)
+2026-09-18 10:55:39 [-] INFO     session_store — Session test-set: cleared
+2026-09-18 10:55:39 [-] INFO     session_store — Session created: test-rem
+2026-09-18 10:55:39 [-] INFO     session_store — Session test-rem: stored 'a.csv' shape=(3, 2)
+2026-09-18 10:55:39 [-] INFO     session_store — Session test-rem: stored 'b.csv' shape=(3, 2)
+2026-09-18 10:55:39 [-] INFO     session_store — Session test-rem: cleared
+2026-09-18 10:55:40 [-] INFO     session_store — Session created: test-cle
+2026-09-18 10:55:40 [-] INFO     session_store — Session test-cle: stored 'data.csv' shape=(3, 2)
+2026-09-18 10:55:40 [-] INFO     session_store — Session test-cle: cleared
+2026-09-18 10:55:40 [-] INFO     session_store — Session created: test-lis
+2026-09-18 10:55:40 [-] INFO     session_store — Session test-lis: stored 'data.csv' shape=(3, 2)
+2026-09-18 10:55:40 [-] INFO     session_store — Session test-lis: cleared
+2026-09-18 10:55:40 [-] INFO     session_store — Session created: test-qua
+2026-09-18 10:55:40 [-] INFO     session_store — Session test-qua: stored 'data.csv' shape=(3, 2)
+2026-09-18 10:55:40 [-] INFO     session_store — Session test-qua: cleared
+2026-09-18 10:55:41 [-] INFO     session_store — Session created: test-qua
+2026-09-18 10:55:41 [-] INFO     session_store — Session test-qua: stored 'data.csv' shape=(3, 2)
+2026-09-18 10:55:41 [-] INFO     session_store — Session test-qua: cleared
+2026-09-18 10:55:41 [-] INFO     session_store — Session created: test-his
+2026-09-18 10:55:41 [-] INFO     session_store — Session test-his: cleared
+2026-09-18 10:55:41 [-] INFO     session_store — Session created: test-his
+2026-09-18 10:55:41 [-] INFO     session_store — Session test-his: cleared
+2026-09-18 10:55:42 [-] INFO     session_store — Session created: test-his
+2026-09-18 10:55:42 [-] INFO     session_store — Session test-his: cleared
+2026-09-18 10:55:42 [-] INFO     session_store — Session created: test-inf
+2026-09-18 10:55:42 [-] INFO     session_store — Session test-inf: stored 'data.csv' shape=(3, 2)
+2026-09-18 10:55:42 [-] INFO     session_store — Session test-inf: cleared
+2026-09-18 10:55:43 [-] INFO     session_store — Session created: test-ext
+2026-09-18 10:55:43 [-] INFO     session_store — Session test-ext: stored 'data.csv' shape=(3, 2)
+2026-09-18 10:55:43 [-] INFO     session_store — Session test-ext: cleared
+2026-09-18 10:55:43 [-] INFO     session_store — Session created: cnt-a
+2026-09-18 10:55:43 [-] INFO     session_store — Session cnt-a: stored 'a.csv' shape=(3, 2)
+2026-09-18 10:55:43 [-] INFO     session_store — Session created: cnt-b
+2026-09-18 10:55:43 [-] INFO     session_store — Session cnt-b: stored 'b.csv' shape=(3, 2)
+2026-09-18 10:55:43 [-] INFO     session_store — Session cnt-a: cleared
+2026-09-18 10:55:43 [-] INFO     session_store — Session cnt-b: cleared
+2026-09-18 10:56:21 [543eeadd] INFO     api — GET /api/health status=200 latency=3ms
+2026-09-18 10:56:21 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/health "HTTP/1.1 200 OK"
+2026-09-18 10:56:21 [b0dd1295] INFO     core.data_quality — Profiled 'employees.csv': 3 rows, 4 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:56:21 [b0dd1295] INFO     session_store — Session created: 52e1d314
+2026-09-18 10:56:21 [b0dd1295] INFO     session_store — Session 52e1d314: stored 'employees.csv' shape=(3, 4)
+2026-09-18 10:56:21 [b0dd1295] INFO     api — Session 52e1d314: stored 'employees.csv' (3, 4)
+2026-09-18 10:56:21 [b0dd1295] INFO     api — POST /api/upload status=200 latency=14ms
+2026-09-18 10:56:21 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [6109073e] INFO     api — POST /api/upload status=400 latency=1ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 400 Bad Request"
+2026-09-18 10:56:22 [6d89ba21] INFO     api — POST /api/upload status=400 latency=1ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 400 Bad Request"
+2026-09-18 10:56:22 [c86aa704] INFO     api — GET /api/files status=200 latency=1ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/files?session_id=8e550caf-8bac-44e0-a8c5-72fd1d259655 "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [9e37ff2b] INFO     core.data_quality — Profiled 'emp.csv': 3 rows, 4 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:56:22 [9e37ff2b] INFO     session_store — Session created: 087beb8b
+2026-09-18 10:56:22 [9e37ff2b] INFO     session_store — Session 087beb8b: stored 'emp.csv' shape=(3, 4)
+2026-09-18 10:56:22 [9e37ff2b] INFO     api — Session 087beb8b: stored 'emp.csv' (3, 4)
+2026-09-18 10:56:22 [9e37ff2b] INFO     api — POST /api/upload status=200 latency=15ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [9d9a9892] INFO     api — GET /api/files status=200 latency=1ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/files?session_id=087beb8b-cf1e-4d9d-a9fa-e2adb84e1347 "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [290a9cd7] INFO     core.data_quality — Profiled 'emp.csv': 3 rows, 4 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:56:22 [290a9cd7] INFO     session_store — Session created: d226aa4b
+2026-09-18 10:56:22 [290a9cd7] INFO     session_store — Session d226aa4b: stored 'emp.csv' shape=(3, 4)
+2026-09-18 10:56:22 [290a9cd7] INFO     api — Session d226aa4b: stored 'emp.csv' (3, 4)
+2026-09-18 10:56:22 [290a9cd7] INFO     api — POST /api/upload status=200 latency=13ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [f7f418dd] INFO     session_store — Session d226aa4b: cleared
+2026-09-18 10:56:22 [f7f418dd] INFO     api — Session d226aa4b: cleared
+2026-09-18 10:56:22 [f7f418dd] INFO     api — DELETE /api/clear status=200 latency=1ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: DELETE http://testserver/api/clear?session_id=d226aa4b-caeb-4a32-bab3-d97f9d5d8654 "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [d60cb3e8] INFO     api — GET /api/files status=200 latency=0ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/files?session_id=d226aa4b-caeb-4a32-bab3-d97f9d5d8654 "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [8dfb2b38] INFO     core.data_quality — Profiled 'emp.csv': 3 rows, 4 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:56:22 [8dfb2b38] INFO     session_store — Session created: 9d3e6437
+2026-09-18 10:56:22 [8dfb2b38] INFO     session_store — Session 9d3e6437: stored 'emp.csv' shape=(3, 4)
+2026-09-18 10:56:22 [8dfb2b38] INFO     api — Session 9d3e6437: stored 'emp.csv' (3, 4)
+2026-09-18 10:56:22 [8dfb2b38] INFO     api — POST /api/upload status=200 latency=14ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [caa87d58] INFO     api — Session 9d3e6437: removed 'emp.csv'
+2026-09-18 10:56:22 [caa87d58] INFO     api — DELETE /api/file status=200 latency=1ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: DELETE http://testserver/api/file?session_id=9d3e6437-51d9-4b33-8fb8-cd486b2a03ea&filename=emp.csv "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [ce79060e] INFO     api — POST /api/query status=400 latency=668ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/query "HTTP/1.1 400 Bad Request"
+2026-09-18 10:56:22 [c84660e4] INFO     core.data_quality — Profiled 'emp.csv': 3 rows, 4 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:56:22 [c84660e4] INFO     session_store — Session created: ede9f172
+2026-09-18 10:56:22 [c84660e4] INFO     session_store — Session ede9f172: stored 'emp.csv' shape=(3, 4)
+2026-09-18 10:56:22 [c84660e4] INFO     api — Session ede9f172: stored 'emp.csv' (3, 4)
+2026-09-18 10:56:22 [c84660e4] INFO     api — POST /api/upload status=200 latency=13ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [fa892abf] INFO     api — POST /api/query status=400 latency=0ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/query "HTTP/1.1 400 Bad Request"
+2026-09-18 10:56:22 [9331157f] INFO     core.data_quality — Profiled 'emp.csv': 3 rows, 4 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 10:56:22 [9331157f] INFO     session_store — Session created: 867c7dd7
+2026-09-18 10:56:22 [9331157f] INFO     session_store — Session 867c7dd7: stored 'emp.csv' shape=(3, 4)
+2026-09-18 10:56:22 [9331157f] INFO     api — Session 867c7dd7: stored 'emp.csv' (3, 4)
+2026-09-18 10:56:22 [9331157f] INFO     api — POST /api/upload status=200 latency=11ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/upload "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [6db3f042] INFO     api — GET /api/session/info status=200 latency=3ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/session/info?session_id=867c7dd7-11b7-4fb7-81a5-21b20dd51b1b "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [4ad1ff26] INFO     api — POST /api/session/extend status=200 latency=0ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: POST http://testserver/api/session/extend?session_id=8e7f24b1-aec4-4093-ae97-3b53c607fd7c "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [-] INFO     session_store — Session created: 81417f17
+2026-09-18 10:56:22 [e3128b73] INFO     api — Session 81417f17: history cleared
+2026-09-18 10:56:22 [e3128b73] INFO     api — DELETE /api/history status=200 latency=1ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: DELETE http://testserver/api/history?session_id=81417f17-86fc-49e2-88cb-9fc3a867bd3a "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [-] INFO     session_store — Session created: 61102242
+2026-09-18 10:56:22 [9626a2de] INFO     api — GET /api/history status=200 latency=1ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/history?session_id=61102242-d39e-46e3-bb0a-a91bdff4ef34 "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [97a0f145] INFO     api — GET /api/provenance status=200 latency=0ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/provenance?session_id=db3a2128-a825-4288-83b1-e5bb6cf73b83 "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [c870529c] INFO     api — GET /api/metrics status=200 latency=0ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/metrics "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [c778fab6] INFO     api — GET /api/prompts status=200 latency=1ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/prompts "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [fc21ea5f] INFO     api — GET /api/health status=200 latency=0ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/health "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [test-rid-123] INFO     api — GET /api/health status=200 latency=0ms
+2026-09-18 10:56:22 [-] INFO     httpx2 — HTTP Request: GET http://testserver/api/health "HTTP/1.1 200 OK"
+2026-09-18 10:56:22 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: forbidden import 'os'"]
+2026-09-18 10:56:22 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: forbidden import 'subprocess'"]
+2026-09-18 10:56:22 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: forbidden import 'sys'"]
+2026-09-18 10:56:22 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: forbidden 'from os import …'"]
+2026-09-18 10:56:22 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: forbidden call 'open()'"]
+2026-09-18 10:56:22 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: forbidden call 'eval()'"]
+2026-09-18 10:56:22 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: forbidden call 'exec()'"]
+2026-09-18 10:56:22 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: forbidden call 'compile()'"]
+2026-09-18 10:56:22 [-] WARNING  core.code_validator — Code validation found 2 issue(s): ["Line 1: suspicious dunder attribute access '.__subclasses__'", "Line 1: suspicious dunder attribute access '.__class__'"]
+2026-09-18 10:56:22 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: suspicious dunder name reference '__builtins__'"]
+2026-09-18 10:56:22 [-] WARNING  core.code_validator — Code validation found 1 issue(s): ["Line 1: forbidden import 'os'"]
+2026-09-18 10:56:23 [-] INFO     core.data_quality — Profiled 'test.csv': 5 rows, 4 cols, 0 dups, 2 nulls, 0 warnings
+2026-09-18 10:56:23 [-] INFO     core.data_quality — Profiled 'test.csv': 5 rows, 4 cols, 0 dups, 2 nulls, 0 warnings
+2026-09-18 10:56:23 [-] INFO     core.data_quality — Profiled 'dup.csv': 3 rows, 2 cols, 1 dups, 0 nulls, 1 warnings
+2026-09-18 10:56:23 [-] INFO     core.data_quality — Profiled 'test.csv': 5 rows, 4 cols, 0 dups, 2 nulls, 0 warnings
+2026-09-18 10:56:23 [-] INFO     core.data_quality — Profiled 'test.csv': 5 rows, 4 cols, 0 dups, 2 nulls, 0 warnings
+2026-09-18 10:56:23 [-] INFO     core.data_quality — Profiled 'outlier.csv': 9 rows, 1 cols, 5 dups, 0 nulls, 2 warnings
+2026-09-18 10:56:23 [-] INFO     core.data_quality — Profiled 'nulls.csv': 100 rows, 1 cols, 98 dups, 80 nulls, 3 warnings
+2026-09-18 10:56:23 [-] WARNING  core.sandbox — Sandbox execution error: name 'open' is not defined
+2026-09-18 10:56:23 [-] WARNING  core.sandbox — Sandbox execution error: Import of module 'os' is not allowed in this sandbox.
+2026-09-18 10:56:23 [-] WARNING  core.sandbox — Sandbox execution error: name 'eval' is not defined
+2026-09-18 10:56:23 [-] WARNING  core.sandbox — Sandbox execution error: name 'exec' is not defined
+2026-09-18 10:56:25 [-] WARNING  core.sandbox — Code execution timed out after 2s
+2026-09-18 10:56:26 [-] INFO     session_store — Session created: test-set
+2026-09-18 10:56:26 [-] INFO     session_store — Session test-set: stored 'data.csv' shape=(3, 2)
+2026-09-18 10:56:26 [-] INFO     session_store — Session test-set: cleared
+2026-09-18 10:56:27 [-] INFO     session_store — Session created: test-rem
+2026-09-18 10:56:27 [-] INFO     session_store — Session test-rem: stored 'a.csv' shape=(3, 2)
+2026-09-18 10:56:27 [-] INFO     session_store — Session test-rem: stored 'b.csv' shape=(3, 2)
+2026-09-18 10:56:27 [-] INFO     session_store — Session test-rem: cleared
+2026-09-18 10:56:27 [-] INFO     session_store — Session created: test-cle
+2026-09-18 10:56:27 [-] INFO     session_store — Session test-cle: stored 'data.csv' shape=(3, 2)
+2026-09-18 10:56:27 [-] INFO     session_store — Session test-cle: cleared
+2026-09-18 10:56:27 [-] INFO     session_store — Session created: test-lis
+2026-09-18 10:56:27 [-] INFO     session_store — Session test-lis: stored 'data.csv' shape=(3, 2)
+2026-09-18 10:56:27 [-] INFO     session_store — Session test-lis: cleared
+2026-09-18 10:56:27 [-] INFO     session_store — Session created: test-qua
+2026-09-18 10:56:27 [-] INFO     session_store — Session test-qua: stored 'data.csv' shape=(3, 2)
+2026-09-18 10:56:27 [-] INFO     session_store — Session test-qua: cleared
+2026-09-18 10:56:28 [-] INFO     session_store — Session created: test-qua
+2026-09-18 10:56:28 [-] INFO     session_store — Session test-qua: stored 'data.csv' shape=(3, 2)
+2026-09-18 10:56:28 [-] INFO     session_store — Session test-qua: cleared
+2026-09-18 10:56:28 [-] INFO     session_store — Session created: test-his
+2026-09-18 10:56:28 [-] INFO     session_store — Session test-his: cleared
+2026-09-18 10:56:28 [-] INFO     session_store — Session created: test-his
+2026-09-18 10:56:28 [-] INFO     session_store — Session test-his: cleared
+2026-09-18 10:56:29 [-] INFO     session_store — Session created: test-his
+2026-09-18 10:56:29 [-] INFO     session_store — Session test-his: cleared
+2026-09-18 10:56:29 [-] INFO     session_store — Session created: test-inf
+2026-09-18 10:56:29 [-] INFO     session_store — Session test-inf: stored 'data.csv' shape=(3, 2)
+2026-09-18 10:56:29 [-] INFO     session_store — Session test-inf: cleared
+2026-09-18 10:56:30 [-] INFO     session_store — Session created: test-ext
+2026-09-18 10:56:30 [-] INFO     session_store — Session test-ext: stored 'data.csv' shape=(3, 2)
+2026-09-18 10:56:30 [-] INFO     session_store — Session test-ext: cleared
+2026-09-18 10:56:30 [-] INFO     session_store — Session created: cnt-a
+2026-09-18 10:56:30 [-] INFO     session_store — Session cnt-a: stored 'a.csv' shape=(3, 2)
+2026-09-18 10:56:30 [-] INFO     session_store — Session created: cnt-b
+2026-09-18 10:56:30 [-] INFO     session_store — Session cnt-b: stored 'b.csv' shape=(3, 2)
+2026-09-18 10:56:30 [-] INFO     session_store — Session cnt-a: cleared
+2026-09-18 10:56:30 [-] INFO     session_store — Session cnt-b: cleared

@@ -1,76 +1,215 @@
 # DataLens AI
 
-**Multi-file CSV/Excel analytics powered by ExperientialLabs `gpt-6-astra` + LangGraph**
+**Production-grade multi-file CSV/Excel analytics powered by ExperientialLabs LLM + LangGraph.**
 
 ---
 
-## Approach
-
-The app lets users upload any number of CSV or Excel files and ask analytical questions in plain English. Every answer is produced by **LLM-generated pandas code that is actually executed** — so the result is always a precise, computed value, never a hallucinated estimate.
-
-```
-Upload files → ask anything → LLM reads schema → writes pandas/matplotlib code → exec() → exact answer
-```
-
-Multi-sheet Excel files are automatically split into one dataset per sheet. CSVs fall back to latin-1 encoding if UTF-8 fails. Files persist in a server-side in-memory session store keyed by a UUID the browser generates on first visit.
-
----
-
-## Key Decisions
-
-**1. LLM writes code, not answers.**  
-Instead of asking the LLM "what is the total revenue?" and trusting its text reply, we ask it to write `df['revenue'].sum()` and execute that. Precision is guaranteed by the Python runtime, not by the model's memory.
-
-**2. LangGraph StateGraph for orchestration.**  
-A two-node graph: `classify → analyze | visualize`. The intent classification is itself an LLM call that receives the real column names and sample data — so it routes correctly for any phrasing without brittle keyword lists.
-
-**3. Full schema in every prompt.**  
-Every LLM call receives column names, dtypes, null counts, unique counts, and 5 sample rows for every uploaded file. The model generates code using the actual column names — no assumptions, no hardcoded mappings.
-
-**4. FastAPI serves the SPA directly.**  
-No Streamlit, no separate frontend process. `GET /` returns a single HTML file; `POST /api/query` runs the agent. One `uvicorn` command starts everything.
-
-**5. Multi-sheet Excel awareness.**  
-`pd.read_excel(sheet_name=None)` reads all sheets. A 3-sheet workbook becomes three queryable datasets (`report[Sales]`, `report[Expenses]`, `report[Summary]`), all visible in the sidebar.
-
----
-
-## Stack
-
-| Layer | Choice |
-|---|---|
-| LLM | ExperientialLabs `gpt-6-astra` via OpenAI-compatible client |
-| Agent | LangGraph `StateGraph` (Python 3.14) |
-| Backend | FastAPI + uvicorn |
-| Frontend | Vanilla HTML/CSS/JS SPA (Chart.js, marked.js) |
-| Data | pandas, openpyxl, xlrd |
-
----
-
-## What I'd Build Next
-
-**Conversation memory** — the current session is stateless within a query. Feeding the last 3–5 exchanges into each LLM call would let users ask follow-ups like "now filter that to Q4 only."
-
-**Auto-chart on analysis results** — when the LLM analysis produces a numeric table, automatically offer an interactive Chart.js chart without the user having to re-ask "show this as a chart."
-
-**SQL export** — let users download the LLM-generated pandas code as a SQL query so they can run it against their production database directly.
-
-**Streaming responses** — stream the LLM output token-by-token to the browser so long analysis tasks feel instant rather than making the user wait for the full response.
-
-**Persistent sessions** — swap the in-memory store for Redis or SQLite so file uploads survive server restarts and users can return to a previous session.
-
----
-
-## Run
+## Quick Start
 
 ```bash
-# one-time setup
-uv python install 3.14
-uv venv --python 3.14 --seed --clear
-uv pip install -r requirements.txt
+# One-time setup
+python -m venv .venv
+.venv\Scripts\activate          # Windows
+pip install -r requirements.txt
 
-# start (single command)
-uv run uvicorn api:app --host 0.0.0.0 --port 8000 --reload
+# Configure (copy and fill in your API key)
+copy .env.example .env
+
+# Run
+uvicorn api:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Open **http://localhost:8000** — upload any CSV or Excel, ask anything.
+Open **http://localhost:8000** — upload any CSV or Excel, ask anything in plain English.
+
+---
+
+## Architecture
+
+```
+Browser (SPA)
+    │   GET /           → static/index.html
+    │   POST /api/upload
+    │   POST /api/query
+    │   GET  /api/files
+    │   GET  /api/health
+    │   GET  /api/provenance
+    └──────────────────────────────────────────────────
+                          FastAPI (api.py)
+                               │
+                        LangGraph Agent (agent.py)
+                    ┌──────────┴──────────────┐
+              structural_check           intent_classify
+              (pandas, no LLM)          (1 LLM call)
+                                    ┌────┴────┐
+                                  analyze  visualize
+                                     │        │
+                               api_endpoints/
+                               analysis.py   visualize.py
+                                     │        │
+                              core/ ─────────────────────
+                              ├── sandbox.py         (secure exec)
+                              ├── code_validator.py  (AST check)
+                              ├── data_quality.py    (profiling)
+                              ├── join_detector.py   (cross-file)
+                              ├── memory.py          (history)
+                              ├── provenance.py      (lineage)
+                              ├── metrics.py         (reliability)
+                              └── logging_config.py  (observability)
+                                     │
+                              session_store.py        (TTL sessions)
+                              prompt.py               (versioned prompts)
+```
+
+---
+
+## API Reference
+
+### File Management
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/api/upload` | Upload CSV/Excel files to a session |
+| `GET` | `/api/files` | List files and metadata for a session |
+| `DELETE` | `/api/file` | Remove a single file |
+| `DELETE` | `/api/clear` | Remove all files for a session |
+
+### Query
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/api/query` | Run an analytical or visualization query |
+
+**Request:**
+```json
+{ "session_id": "abc-123", "query": "What is the total salary by department?" }
+```
+
+**Response:**
+```json
+{
+  "result": "### Total Salary by Department\n...",
+  "image_base64": null,
+  "chart_data": null,
+  "delta_used": false,
+  "intent": "analysis"
+}
+```
+
+### Conversation
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/history` | Get conversation history (last N turns) |
+| `DELETE` | `/api/history` | Clear conversation history |
+
+### Session Management
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/session/info` | Session metadata (age, TTL, memory) |
+| `POST` | `/api/session/extend` | Reset session TTL |
+
+### Observability
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/health` | Uptime, session count, reliability metrics |
+| `GET` | `/api/metrics` | Global query success/retry/latency stats |
+| `GET` | `/api/provenance` | Per-session query lineage trail |
+| `GET` | `/api/prompts` | List all registered prompt templates |
+| `GET` | `/metrics` | Prometheus metrics (via instrumentator) |
+
+### Legacy (Backward Compatible)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/analyze` | Direct analysis with base64-encoded file payloads |
+| `POST` | `/visualize` | Direct visualization |
+| `POST` | `/smart_chart` | Convert chart_data dict to PNG |
+
+---
+
+## Configuration
+
+Copy `.env.example` to `.env` and set:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `EXPLABS_API_KEY` | *(required)* | ExperientialLabs API key |
+| `EXPLABS_BASE_URL` | `https://api.experientiallabs.ai/v1` | API base URL |
+| `EXPLABS_MODEL` | `gpt-5.6-luna` | Model name |
+| `GROQ_API_KEY` | — | Fallback: Groq API key |
+| `GROQ_MODEL` | `llama-3.3-70b-versatile` | Fallback model |
+| `SESSION_TTL_SECONDS` | `7200` | Session expiry (2 hours) |
+| `MAX_FILE_SIZE_MB` | `50` | Max upload file size |
+| `MAX_FILES_PER_SESSION` | `20` | Max files per session |
+| `MAX_ROWS_PER_FILE` | `500000` | Max rows per file |
+| `MAX_RETRIES` | `2` | LLM code retry attempts on failure |
+| `QUERY_TIMEOUT_SECONDS` | `30` | Sandbox execution timeout |
+| `LOG_LEVEL` | `INFO` | Logging level (DEBUG/INFO/WARNING/ERROR) |
+
+---
+
+## Security
+
+- **Code execution is sandboxed**: `exec()` runs in an isolated namespace with a strict allowlist of builtins. `open`, `eval`, `exec`, `__import__`, `os`, `sys`, `subprocess`, `socket` are all blocked.
+- **Static analysis before execution**: All LLM-generated code is AST-parsed to detect forbidden imports and calls before any code runs.
+- **Timeout enforcement**: Every code execution is limited to `QUERY_TIMEOUT_SECONDS` (default 30s) via a threading timeout.
+- **Memory tracking**: `tracemalloc` monitors peak memory; execution fails if it exceeds `512 MB`.
+
+---
+
+## Testing
+
+```bash
+# Run all tests
+python -m pytest tests/ -v --tb=short
+
+# Run specific test file
+python -m pytest tests/test_sandbox.py -v
+
+# Run evaluation suite (requires live session with uploaded data)
+python -m tests.eval_framework --session <session_id> --numeric-col salary --cat-col dept
+```
+
+---
+
+## Docker
+
+```bash
+# Build
+docker build -t datalens-ai .
+
+# Run
+docker run -p 8080:8080 --env-file .env datalens-ai
+
+# Docker Compose (with env vars)
+docker compose up
+```
+
+---
+
+## Known Limitations
+
+1. **In-memory session storage** — sessions are lost on server restart. Use Redis for persistence (swap `session_store.py`).
+2. **Single-worker required** — the in-memory store does not work across multiple uvicorn workers. Use `--workers 1` or add a shared backend.
+3. **LLM hallucinations** — the sandbox catches runtime errors (wrong column names, type mismatches) and retries, but deeply incorrect logic may still produce a plausible-looking but wrong answer. Always sanity-check critical results.
+4. **File format support** — CSV and XLSX/XLS only. Parquet, JSON, and database connectors are not yet supported.
+5. **No authentication** — all sessions are open by session_id UUID. Add auth middleware if deploying publicly.
+6. **Visualization complexity** — very complex multi-axis or animated charts may exceed LLM context or timeout; simplify the query if this occurs.
+
+---
+
+## Data Flow
+
+```
+1. Upload:   raw bytes → pandas → normalize_dataframe() → profile_dataframe() → session_store
+2. Query:    session_id + query → LangGraph agent
+3. Agent:    schema_summary + conversation_history + join_hints → LLM prompt
+4. LLM:      generates Python pandas/matplotlib code
+5. Validate: code_validator.assert_safe(code) — AST check
+6. Execute:  sandbox.run_code(code, env) — timeout + memory limits
+7. Retry:    on failure, append error to prompt, re-ask LLM (up to MAX_RETRIES)
+8. Track:    provenance.record_query() + metrics.record_metric()
+9. Memory:   memory.add_exchange() → stored in session for next query
+```

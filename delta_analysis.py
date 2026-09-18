@@ -10,6 +10,11 @@ and are answered by the LLM via pandas code generation in analysis.py.
 
 This design means the app can handle ANY arbitrary question through
 LLM code generation, with no keyword-based column/intent matching.
+
+Upgrade note (v4):
+  - _handle_describe now includes data-quality warnings if a
+    quality_report is available in the session store.
+  - All handlers accept an optional session_id to look up reports.
 """
 
 import re
@@ -31,7 +36,7 @@ def _tokens(text: str) -> set:
 
 # ── Structural handlers ──────────────────────────────────────────────────────
 
-def _handle_describe(dfs: Dict[str, pd.DataFrame]) -> Tuple[str, None]:
+def _handle_describe(dfs: Dict[str, pd.DataFrame], session_id: str = "") -> Tuple[str, None]:
     lines = []
     for name, df in dfs.items():
         lines.append(f"### 📄 {name}")
@@ -70,9 +75,20 @@ def _handle_describe(dfs: Dict[str, pd.DataFrame]) -> Tuple[str, None]:
                 pct = cnt / len(df) * 100
                 lines.append(f"  - `{col}`: {cnt:,} missing ({pct:.1f}%)")
 
+        # ── Quality warnings from stored report ──
+        if session_id:
+            try:
+                import session_store
+                report = session_store.get_quality_report(session_id, name)
+                if report and report.get("warnings"):
+                    lines.append("\n⚠️ **Data quality warnings:**")
+                    for w in report["warnings"][:5]:
+                        lines.append(f"  - {w}")
+            except Exception:
+                pass
+
         lines.append("")
     return "\n".join(lines), None
-
 
 
 def _handle_null_check(dfs: Dict[str, pd.DataFrame]) -> Tuple[str, None]:
@@ -114,7 +130,9 @@ def _handle_correlation(dfs: Dict[str, pd.DataFrame]) -> Tuple[str, None]:
 # ── Public entry point ───────────────────────────────────────────────────────
 
 def check_delta(
-    query: str, dfs: Dict[str, pd.DataFrame]
+    query: str,
+    dfs: Dict[str, pd.DataFrame],
+    session_id: str = "",
 ) -> Tuple[Optional[str], Optional[Dict[str, Any]]]:
     """
     Fast path for purely structural queries (data shape/schema).
@@ -135,7 +153,7 @@ def check_delta(
     toks = _tokens(query)
 
     if toks & _DESCRIBE_WORDS:
-        return _handle_describe(dfs)
+        return _handle_describe(dfs, session_id=session_id)
 
     if toks & _NULL_WORDS:
         return _handle_null_check(dfs)

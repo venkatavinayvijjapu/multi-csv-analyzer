@@ -1144,12 +1144,8 @@
             });
         }
 
-        let SID = localStorage.getItem('datalens_sid');
-        if (!SID || SID === 'null') { 
-            SID = generateId(); 
-            localStorage.setItem('datalens_sid', SID); 
-        }
-
+        // Always create a fresh session on page load so refreshing clears the files
+        let SID = generateId();
         let files = [];
         let chartN = 0;
 
