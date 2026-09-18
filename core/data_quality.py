@@ -62,28 +62,41 @@ class DataQualityReport:
     column_map: Dict[str, str] = field(default_factory=dict)
 
     def to_dict(self) -> dict:
+        def _safe(v):
+            """Convert any numpy scalar to a native Python type for JSON serialization."""
+            if v is None:
+                return None
+            if isinstance(v, (bool, np.bool_)):
+                return bool(v)
+            if isinstance(v, (int, np.integer)):
+                return int(v)
+            if isinstance(v, (float, np.floating)):
+                f = float(v)
+                return None if (f != f) else f   # NaN → None
+            return str(v)
+
         return {
-            "filename": self.filename,
-            "rows": self.rows,
-            "columns": self.columns,
-            "duplicate_rows": self.duplicate_rows,
-            "duplicate_pct": round(self.duplicate_pct, 2),
-            "total_nulls": self.total_nulls,
-            "total_null_pct": round(self.total_null_pct, 2),
-            "warnings": self.warnings,
-            "column_map": self.column_map,
+            "filename": str(self.filename),
+            "rows": int(self.rows),
+            "columns": int(self.columns),
+            "duplicate_rows": int(self.duplicate_rows),
+            "duplicate_pct": round(float(self.duplicate_pct), 2),
+            "total_nulls": int(self.total_nulls),
+            "total_null_pct": round(float(self.total_null_pct), 2),
+            "warnings": [str(w) for w in self.warnings],
+            "column_map": {str(k): str(v) for k, v in self.column_map.items()},
             "column_profiles": [
                 {
-                    "name": c.name,
-                    "dtype": c.dtype,
-                    "inferred_type": c.inferred_type,
-                    "null_count": c.null_count,
-                    "null_pct": round(c.null_pct, 2),
-                    "unique_count": c.unique_count,
-                    "outlier_count": c.outlier_count,
-                    "has_mixed_types": c.has_mixed_types,
-                    "top_value": str(c.top_value) if c.top_value is not None else None,
-                    "top_value_pct": round(c.top_value_pct, 2),
+                    "name": str(c.name),
+                    "dtype": str(c.dtype),
+                    "inferred_type": str(c.inferred_type),
+                    "null_count": int(c.null_count),
+                    "null_pct": round(float(c.null_pct), 2),
+                    "unique_count": int(c.unique_count),
+                    "outlier_count": int(c.outlier_count),
+                    "has_mixed_types": bool(c.has_mixed_types),
+                    "top_value": _safe(c.top_value),
+                    "top_value_pct": round(float(c.top_value_pct), 2),
                 }
                 for c in self.column_profiles
             ],

@@ -42,6 +42,32 @@ from core.data_quality import profile_dataframe, normalize_dataframe
 from core.provenance import get_provenance_dicts, session_stats
 from core.metrics import get_global_stats
 
+
+# ── Numpy-safe JSON serialization ─────────────────────────────────────────────
+import json
+import numpy as np
+
+class _NumpyEncoder(json.JSONEncoder):
+    """Convert numpy scalars / arrays to native Python types before JSON encoding."""
+    def default(self, obj):
+        if isinstance(obj, np.bool_):
+            return bool(obj)
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            f = float(obj)
+            return None if (f != f) else f   # NaN → None
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super().default(obj)
+
+
+def _jsonify(data) -> JSONResponse:
+    """Return a JSONResponse that safely handles numpy types."""
+    return JSONResponse(
+        content=json.loads(json.dumps(data, cls=_NumpyEncoder))
+    )
+
 # ── Logging (must be first) ──────────────────────────────────────────────────
 setup_logging(log_level=os.getenv("LOG_LEVEL", "INFO"))
 logger = get_logger(__name__)
@@ -230,11 +256,11 @@ async def upload_files(
     if errors and not uploaded:
         raise HTTPException(status_code=400, detail="; ".join(errors))
 
-    return {
+    return _jsonify({
         "success": True,
         "files":   session_store.list_files(session_id),
         "errors":  errors,
-    }
+    })
 
 
 def _store_file(
