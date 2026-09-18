@@ -1184,8 +1184,16 @@
            FILE UPLOAD
         ══════════════════════════════════════════════════════ */
         async function uploadFiles(list) {
+            // Block unsupported formats immediately — no network call needed
+            const invalid = list.filter(f => !/\.(csv|xlsx|xls)$/i.test(f.name));
+            if (invalid.length) {
+                const names = invalid.map(f => f.name).join(', ');
+                toast(`❌ Unsupported file type: ${names}. Only CSV and Excel files (.csv, .xlsx, .xls) are supported.`, 'err');
+                return;
+            }
+
             const valid = list.filter(f => /\.(csv|xlsx|xls)$/i.test(f.name));
-            if (!valid.length) { toast('Only CSV and Excel files are supported.', 'err'); return; }
+            if (!valid.length) return;
 
             setProg(true);
             try {
@@ -1194,7 +1202,16 @@
                 valid.forEach(f => fd.append('files', f));
 
                 const r = await fetch('/api/upload', { method: 'POST', body: fd });
-                const data = await r.json();
+
+                // Safely parse JSON — server may return HTML on unexpected 500s
+                let data;
+                const contentType = r.headers.get('content-type') || '';
+                if (contentType.includes('application/json')) {
+                    data = await r.json();
+                } else {
+                    const text = await r.text();
+                    data = { detail: `Server error (${r.status}): ${text.slice(0, 120)}` };
+                }
 
                 if (r.ok) {
                     files = data.files || [];
@@ -1204,7 +1221,7 @@
                 } else {
                     toast(`Upload failed: ${data.detail || r.statusText}`, 'err');
                 }
-            } catch (e) { toast(`Error: ${e.message}`, 'err'); }
+            } catch (e) { toast(`Upload error: ${e.message}`, 'err'); }
             finally { setProg(false); }
         }
 

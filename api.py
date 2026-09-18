@@ -94,6 +94,41 @@ async def request_id_middleware(request: Request, call_next):
     return response
 
 
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    """Always return JSON for HTTP errors (overrides FastAPI HTML default)."""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail or str(exc)},
+        headers={"Content-Type": "application/json"},
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """Return JSON for request validation errors."""
+    return JSONResponse(
+        status_code=422,
+        content={"detail": str(exc.errors())},
+        headers={"Content-Type": "application/json"},
+    )
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    """Catch-all: always return JSON for any unhandled 500 error."""
+    logger.error(f"Unhandled exception on {request.method} {request.url.path}: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": f"Internal server error: {type(exc).__name__}: {exc}"},
+        headers={"Content-Type": "application/json"},
+    )
+
+
 # ── Routers (legacy HTTP endpoints kept for compatibility) ────────────────────
 app.include_router(analysis.router,   tags=["Analysis"])
 app.include_router(visualize.router,  tags=["Visualize"])

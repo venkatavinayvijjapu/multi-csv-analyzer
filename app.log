@@ -403,3 +403,28 @@
 2026-09-18 10:56:30 [-] INFO     session_store — Session cnt-b: stored 'b.csv' shape=(3, 2)
 2026-09-18 10:56:30 [-] INFO     session_store — Session cnt-a: cleared
 2026-09-18 10:56:30 [-] INFO     session_store — Session cnt-b: cleared
+2026-09-18 11:21:02 [afba4b6a] INFO     api — GET / status=200 latency=5ms
+2026-09-18 11:21:03 [d629234f] INFO     api — GET /api/files status=200 latency=1ms
+2026-09-18 11:21:03 [515b6bbf] INFO     api — GET /favicon.ico status=404 latency=0ms
+2026-09-18 11:21:10 [4b6e74f8] INFO     core.data_quality — Profiled 'expenses.csv': 12 rows, 5 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 11:21:10 [4b6e74f8] INFO     session_store — Session created: 860d15d3
+2026-09-18 11:21:10 [4b6e74f8] INFO     session_store — Session 860d15d3: stored 'expenses.csv' shape=(12, 5)
+2026-09-18 11:21:10 [4b6e74f8] INFO     api — Session 860d15d3: stored 'expenses.csv' (12, 5)
+2026-09-18 11:21:10 [4b6e74f8] INFO     core.data_quality — Profiled 'customers.csv': 10 rows, 7 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 11:21:10 [4b6e74f8] INFO     session_store — Session 860d15d3: stored 'customers.csv' shape=(10, 7)
+2026-09-18 11:21:10 [4b6e74f8] INFO     api — Session 860d15d3: stored 'customers.csv' (10, 7)
+2026-09-18 11:21:10 [4b6e74f8] INFO     core.data_quality — Profiled 'sales.csv': 12 rows, 7 cols, 0 dups, 0 nulls, 0 warnings
+2026-09-18 11:21:10 [4b6e74f8] INFO     session_store — Session 860d15d3: stored 'sales.csv' shape=(12, 7)
+2026-09-18 11:21:10 [4b6e74f8] INFO     api — Session 860d15d3: stored 'sales.csv' (12, 7)
+2026-09-18 11:21:10 [4b6e74f8] INFO     api — POST /api/upload status=200 latency=54ms
+2026-09-18 11:21:45 [346e5114] INFO     api — Session 860d15d3: query='Show total for all numeric columns'
+2026-09-18 11:21:46 [346e5114] INFO     agent — Structural fast-path: Show total for all numeric columns
+2026-09-18 11:21:46 [346e5114] INFO     api — POST /api/query status=200 latency=964ms
+2026-09-18 11:22:09 [b1adb64b] INFO     api — Session 860d15d3: query='what is the total revenue in january'
+2026-09-18 11:22:12 [b1adb64b] INFO     httpx2 — HTTP Request: POST https://api.experientiallabs.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-18 11:22:12 [b1adb64b] INFO     agent — Intent [analysis]: what is the total revenue in january
+2026-09-18 11:22:12 [b1adb64b] INFO     agent — Analysis node: what is the total revenue in january
+2026-09-18 11:22:12 [b1adb64b] INFO     api_endpoints.analysis — Analysis LLM call: what is the total revenue in january
+2026-09-18 11:22:17 [b1adb64b] INFO     httpx2 — HTTP Request: POST https://api.experientiallabs.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-09-18 11:22:17 [b1adb64b] INFO     api_endpoints.analysis — Analysis done: success=True retried=False latency=5298ms result_len=125
+2026-09-18 11:22:17 [b1adb64b] INFO     api — POST /api/query status=200 latency=8035ms
